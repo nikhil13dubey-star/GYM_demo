@@ -1,5 +1,5 @@
 # AWS EC2 Deployment Guide
-**Gym Habit - Habit Health by Demo webapp**
+**Gym Habit - Demo Webapp**
 
 This guide provides step-by-step instructions for deploying the Gym Habit application to AWS EC2.
 
@@ -207,7 +207,7 @@ python3 main.py
 You should see:
 ```
 ============================================================
-GYM HABIT - Habit Health Partner Gym Finder
+GYM HABIT - Demo Webapp Partner Gym Finder
 ============================================================
 [OK] Loaded 30 gyms from database
 [OK] Available partners: 5

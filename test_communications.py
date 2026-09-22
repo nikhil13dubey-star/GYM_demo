@@ -121,7 +121,7 @@ check("payment card documents the strict Paid condition",
       any("Paid" in c for c in pb["PAYMENT_CONFIRMATION"]["conditions"]))
 for t in ALL_TYPES:
     r = requests.get(f"{BASE}/api/admin/communications/playbook/{t}/preview", headers=H(admin))
-    ok = r.status_code == 200 and r.json().get("subject") and "Habit Health" in r.json().get("html", "")
+    ok = r.status_code == 200 and r.json().get("subject") and "Demo Webapp" in r.json().get("html", "")
     check(f"preview renders: {t}", ok, str(r.status_code))
 r = requests.get(f"{BASE}/api/admin/communications/playbook/BOGUS/preview", headers=H(admin))
 check("preview of unknown type -> 404", r.status_code == 404, str(r.status_code))

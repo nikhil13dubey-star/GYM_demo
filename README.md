@@ -113,9 +113,3 @@ python test_date_filters.py      # IST date filtering, table/export parity
 ```
 
 ---
-
-## Screenshots
-
-| Public site | Admin dashboard |
-|---|---|
-| ![Public](final_6_frontend.png) | ![Admin](test_final_state.png) |

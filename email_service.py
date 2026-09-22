@@ -14,7 +14,7 @@ load_dotenv()
 # Configuration
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 FROM_EMAIL = os.getenv("SENDGRID_FROM_EMAIL", "noreply.healthcare@example.com")
-FROM_NAME = os.getenv("SENDGRID_FROM_NAME", "Habit Health by Demo webapp")
+FROM_NAME = os.getenv("SENDGRID_FROM_NAME", "Demo Webapp")
 SUPPORT_PHONE = "+91-99999-00000"
 
 # Internal recipients CC'd on every PAYMENT_CONFIRMATION email so they have
@@ -40,7 +40,7 @@ class EmailService:
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Habit Health</title>
+            <title>Demo Webapp</title>
         </head>
         <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5;">
             <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
@@ -50,8 +50,8 @@ class EmailService:
                             <!-- Header -->
                             <tr>
                                 <td style="background: linear-gradient(135deg, #0c53a0 0%, #0a4485 100%); padding: 32px; border-radius: 16px 16px 0 0; text-align: center;">
-                                    <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Habit Health</h1>
-                                    <p style="margin: 8px 0 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">by Demo webapp</p>
+                                    <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Demo Webapp</h1>
+                                    
                                 </td>
                             </tr>
                             <!-- Content -->
@@ -123,7 +123,7 @@ class EmailService:
         LEAD_ACKNOWLEDGEMENT - Auto-triggered on lead submission
         Returns (subject, html).
         """
-        subject = "Thank You for Your Interest - Habit Health Gym Package"
+        subject = "Thank You for Your Interest - Demo Webapp Gym Package"
 
         content = f"""
         <h2 style="margin: 0 0 24px 0; color: #111827; font-size: 24px;">Hello {customer_name}!</h2>
@@ -158,7 +158,7 @@ class EmailService:
         NO_RESPONSE_FOLLOWUP - Manual trigger when customer doesn't answer call
         Returns (subject, html).
         """
-        subject = "We Tried Reaching You - Habit Health"
+        subject = "We Tried Reaching You - Demo Webapp"
 
         content = f"""
         <h2 style="margin: 0 0 24px 0; color: #111827; font-size: 24px;">Hi {customer_name},</h2>
@@ -196,7 +196,7 @@ class EmailService:
         PAYMENT_CONFIRMATION - Manual trigger after payment validation
         Returns (subject, html).
         """
-        subject = "Payment Received - Habit Health Gym Package"
+        subject = "Payment Received - Demo Webapp Gym Package"
 
         content = f"""
         <h2 style="margin: 0 0 24px 0; color: #111827; font-size: 24px;">Payment Confirmed!</h2>
@@ -256,7 +256,7 @@ class EmailService:
         Sends transaction details to the customer while the final tax invoice is being prepared.
         Returns (subject, html).
         """
-        subject = "Your Gym Subscription Confirmation - Habit Health"
+        subject = "Your Gym Subscription Confirmation - Demo Webapp"
 
         # Format amount safely (could be int, float, or None)
         try:
@@ -305,7 +305,7 @@ class EmailService:
 
         <p style="margin: 32px 0 0 0; color: #374151; font-size: 15px;">
             Best Regards,<br>
-            <strong>Team Habit Health</strong>
+            <strong>Team Demo Webapp</strong>
         </p>
         """
 
@@ -321,7 +321,7 @@ class EmailService:
         NO_INTEREST_CLOSURE - Manual trigger to close inactive leads
         Returns (subject, html).
         """
-        subject = "Your Gym Package Request - Habit Health"
+        subject = "Your Gym Package Request - Demo Webapp"
 
         content = f"""
         <h2 style="margin: 0 0 24px 0; color: #111827; font-size: 24px;">Hi {customer_name},</h2>

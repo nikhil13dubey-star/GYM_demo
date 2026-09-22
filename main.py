@@ -1,6 +1,6 @@
 """
 Gym Habit - FastAPI Backend Server (MongoDB Version)
-Habit Health by Demo webapp
+Demo Webapp
 """
 
 from fastapi import FastAPI, HTTPException, Query, Form, Depends, UploadFile, File
@@ -14,6 +14,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 import os
 import requests
+from pathlib import Path
 import csv
 import io
 from datetime import datetime, timedelta
@@ -37,24 +38,32 @@ lead_manager = MongoLeadManager()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifespan events"""
-    # Startup
-    await MongoDB.connect_db()
-    await gym_db.initialize()
-    await lead_manager.initialize()
-    await comms.seed_email_settings()
-    print("[OK] MongoDB connection initialized")
+    # Startup. A failure here must not crash the whole app: the pages should still
+    # load and report the problem, rather than every request returning a blank 500.
+    try:
+        await MongoDB.connect_db()
+        await gym_db.initialize()
+        await lead_manager.initialize()
+        await comms.seed_email_settings()
+        print("[OK] MongoDB connection initialized")
+    except Exception as exc:
+        print(f"[ERROR] Startup failed to reach MongoDB: {exc}")
+        print("[ERROR] Set MONGODB_URL (and MONGODB_DB_NAME) — see .env.example")
 
     yield
 
     # Shutdown
-    await MongoDB.close_db()
-    print("[OK] MongoDB connection closed")
+    try:
+        await MongoDB.close_db()
+        print("[OK] MongoDB connection closed")
+    except Exception:
+        pass
 
 
 # Initialize FastAPI app with lifespan
 app = FastAPI(
     title="Gym Habit API",
-    description="Partner Gym Finder for Habit Health",
+    description="Partner Gym Finder for Demo Webapp",
     version="2.0.0",
     lifespan=lifespan
 )
@@ -71,8 +80,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Paths are resolved from this file, not the working directory, so the app also
+# runs where the CWD differs (e.g. a serverless function unpacked into /var/task).
+BASE_DIR = Path(__file__).resolve().parent
+FRONTEND_DIR = BASE_DIR / "frontend"
+
 # Mount static files
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
+app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
 
 # ============================================================================
@@ -309,7 +323,7 @@ class PartnerCreateRequest(BaseModel):
 async def serve_frontend():
     """Serve main user page"""
     try:
-        return FileResponse("frontend/index.html")
+        return FileResponse(str(FRONTEND_DIR / "index.html"))
     except:
         return HTMLResponse("<h1>Frontend not found. Please build frontend first.</h1>")
 
@@ -318,7 +332,7 @@ async def serve_frontend():
 async def serve_admin():
     """Serve admin panel"""
     try:
-        return FileResponse("frontend/admin.html")
+        return FileResponse(str(FRONTEND_DIR / "admin.html"))
     except:
         return HTMLResponse("<h1>Admin panel not found.</h1>")
 
@@ -1287,7 +1301,7 @@ async def send_no_response_email(
     result = email_service.send_no_response_followup(
         customer_email=lead["email"],
         customer_name=lead.get("full_name", "Customer"),
-        gym_name=lead.get("gym_name", "Habit Health Gym"),
+        gym_name=lead.get("gym_name", "Demo Webapp Gym"),
         cc=await comms.get_cc_list("NO_RESPONSE_FOLLOWUP")
     )
     await comms.log_communication(lead, "NO_RESPONSE_FOLLOWUP", "manual",
@@ -1346,7 +1360,7 @@ async def send_payment_confirmation_email(
     result = email_service.send_payment_confirmation(
         customer_email=lead["email"],
         customer_name=lead.get("full_name", "Customer"),
-        gym_name=lead.get("gym_name", "Habit Health Gym"),
+        gym_name=lead.get("gym_name", "Demo Webapp Gym"),
         amount=amount,
         transaction_id=lead.get("lead_id", "N/A"),
         plan_name=lead.get("preferred_plan", "Gym Package"),
@@ -1399,7 +1413,7 @@ async def send_closure_email(
     result = email_service.send_no_interest_closure(
         customer_email=lead["email"],
         customer_name=lead.get("full_name", "Customer"),
-        gym_name=lead.get("gym_name", "Habit Health Gym"),
+        gym_name=lead.get("gym_name", "Demo Webapp Gym"),
         cc=await comms.get_cc_list("NO_INTEREST_CLOSURE")
     )
     await comms.log_communication(lead, "NO_INTEREST_CLOSURE", "manual",
@@ -2476,7 +2490,7 @@ async def health_check():
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("GYM HABIT - Habit Health Partner Gym Finder (MongoDB)")
+    print("GYM HABIT - Demo Webapp Partner Gym Finder (MongoDB)")
     print("=" * 60)
     print("[INFO] Starting server...")
     print("[INFO] Main page: http://localhost:8000")
