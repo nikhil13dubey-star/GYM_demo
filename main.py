@@ -2485,16 +2485,38 @@ async def activate_user(
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint for monitoring"""
-    total_gyms = await MongoDB.db.gyms.count_documents({"is_active": True})
-    partners = await gym_db.get_all_partners()
+    """
+    Health check. Reports the database it is configured to reach and whether
+    that connection works, so a misconfigured deployment is diagnosable without
+    server logs. Credentials are never included.
+    """
+    # Host only — never the username or password
+    target = config.MONGODB_URL
+    if "@" in target:
+        target = target.rsplit("@", 1)[1]
+    target = target.split("/")[0].split("?")[0]
 
-    return {
-        "status": "healthy",
+    info = {
+        "status": "unhealthy",
         "database": "mongodb",
-        "gyms_loaded": total_gyms,
-        "partners": len(partners)
+        "configured_host": target,
+        "configured_db": config.MONGODB_DB_NAME,
     }
+
+    if MongoDB.db is None:
+        info["error"] = "No database connection was established at startup."
+        info["hint"] = "Set MONGODB_URL and MONGODB_DB_NAME, then redeploy."
+        return info
+
+    try:
+        total_gyms = await MongoDB.db.gyms.count_documents({"is_active": True})
+        partners = await gym_db.get_all_partners()
+    except Exception as exc:
+        info["error"] = f"{type(exc).__name__}: {str(exc)[:300]}"
+        return info
+
+    info.update({"status": "healthy", "gyms_loaded": total_gyms, "partners": len(partners)})
+    return info
 
 
 # ============================================================================
