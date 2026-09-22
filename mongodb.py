@@ -12,10 +12,16 @@ class MongoDB:
 
     client: Optional[AsyncIOMotorClient] = None
     db: Optional[AsyncIOMotorDatabase] = None
+    _indexes_ready: bool = False
 
     @classmethod
     async def connect_db(cls):
         """Connect to MongoDB"""
+        # Idempotent: startup calls this three times (app + two managers) and on a
+        # serverless platform every cold start paid for three handshakes.
+        if cls.client is not None and cls.db is not None:
+            return
+
         try:
             cls.client = AsyncIOMotorClient(config.MONGODB_URL)
             cls.db = cls.client[config.MONGODB_DB_NAME]
@@ -36,11 +42,16 @@ class MongoDB:
         """Close MongoDB connection"""
         if cls.client:
             cls.client.close()
+            cls.client = None
+            cls.db = None
+            cls._indexes_ready = False
             print("[MongoDB] [OK] Disconnected from MongoDB")
 
     @classmethod
     async def create_indexes(cls):
-        """Create all necessary indexes"""
+        """Create all necessary indexes (once per process)."""
+        if cls._indexes_ready:
+            return
         try:
             # Gyms collection indexes
             await cls.db.gyms.create_index("gym_id", unique=True)
@@ -67,12 +78,6 @@ class MongoDB:
             # NOTE: cannot combine collation with partialFilterExpression on $type in
             # all MongoDB versions, so we use $exists+$ne instead.
             try:
-                # Drop any prior version of this index first (so re-runs with
-                # different options don't fail with IndexOptionsConflict)
-                try:
-                    await cls.db.leads.drop_index("payment_link_unique_ci")
-                except Exception:
-                    pass  # not present
                 await cls.db.leads.create_index(
                     "payment.payment_link",
                     unique=True,
@@ -96,6 +101,7 @@ class MongoDB:
             await cls.db.communications.create_index("email_type")
             await cls.db.communications.create_index("status")
 
+            cls._indexes_ready = True
             print("[MongoDB] [OK] Indexes created successfully")
 
         except Exception as e:

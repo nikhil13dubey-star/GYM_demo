@@ -1502,22 +1502,17 @@
         }
 
         async function init() {
-            console.log('🏋️ Gym Habit - Initializing...');
+            // Everything starts at once. The gym cards are the point of the page, so
+            // they are rendered as soon as the nearby search returns — they used to
+            // wait on the full catalogue download, which only powers offline
+            // search suggestions and is now loaded in the background.
+            const nearbyPromise = fetchNearbyGyms(DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lon, 20);
+            const partnersPromise = fetchPartners();
 
-            // Load all data
-            const [partners, allGyms] = await Promise.all([
-                fetchPartners(),
-                fetchAllGyms()
-            ]);
+            fetchAllGyms().then(allGyms => { state.allGyms = allGyms || []; });
+            partnersPromise.then(partners => renderBrandFilters(partners || []));
 
-            state.allGyms = allGyms;
-            state.filteredGyms = allGyms;
-
-            // Render brand filters
-            renderBrandFilters(partners);
-
-            // Load default Delhi gyms
-            const delhiGyms = await fetchNearbyGyms(DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lon, 20);
+            const delhiGyms = await nearbyPromise;
             state.filteredGyms = delhiGyms;
             renderGymCards(delhiGyms, false);
 
@@ -1528,7 +1523,6 @@
                 if (e.key === 'Escape') closeModal();
             });
 
-            console.log('✅ App initialized!');
         }
 
         // Run on page load
