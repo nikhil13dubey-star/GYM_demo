@@ -59,7 +59,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
 cp .env.example .env          # optional: add your own API keys
-python seed_demo_data.py      # loads 30 sample gyms + 4 demo users (clears the demo DB first)
+python seed_demo_data.py      # loads 280 sample gyms + 4 demo users (clears the demo DB first)
 uvicorn main:app --reload
 ```
 
@@ -102,7 +102,7 @@ config.py             Environment-driven settings
 seed_demo_data.py     Loads the sample dataset
 frontend/index.html   Public gym finder (single page)
 frontend/admin.html   Admin + agent portal
-gyms.csv              30 sample gyms
+gyms.csv              280 sample gyms
 test_*.py             Integration test suites
 ```
 
