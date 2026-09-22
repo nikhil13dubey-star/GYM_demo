@@ -376,6 +376,29 @@ async def get_gyms(partner: Optional[str] = None):
         }
 
 
+@app.get("/api/home")
+async def home_bootstrap(
+    lat: float = Query(..., description="Latitude to centre the default results on"),
+    lon: float = Query(..., description="Longitude to centre the default results on"),
+    limit: int = Query(20, ge=1, le=50)
+):
+    """
+    Everything the landing page needs, in a single request.
+
+    The page previously called /api/gyms/nearby and /api/partners separately.
+    On a serverless host concurrent calls land on separate instances, so each
+    one paid its own cold start; folding them into one request removes that.
+    """
+    gyms = await gym_db.get_nearby_gyms(lat, lon, limit=limit)
+    partners = await gym_db.get_all_partners()
+    return {
+        "gyms": gyms,
+        "partners": partners,
+        "total": len(gyms),
+        "user_location": {"latitude": lat, "longitude": lon},
+    }
+
+
 @app.get("/api/gyms/nearby")
 async def get_nearby_gyms(
     lat: float = Query(..., description="User latitude"),

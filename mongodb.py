@@ -49,9 +49,37 @@ class MongoDB:
 
     @classmethod
     async def create_indexes(cls):
-        """Create all necessary indexes (once per process)."""
+        """
+        Create any missing indexes (once per process).
+
+        Existing index names are read first so an already-provisioned database
+        costs a handful of round trips at boot instead of one per index.
+        """
         if cls._indexes_ready:
             return
+        try:
+            existing = {}
+            for coll in ("gyms", "leads", "users", "communications"):
+                try:
+                    existing[coll] = set(await cls.db[coll].index_information())
+                except Exception:
+                    existing[coll] = set()
+            expected = {
+                "gyms": {"gym_id_1", "pincode_1", "city_1", "partner_name_1",
+                         "location_2dsphere", "is_active_1", "center_code_1"},
+                "leads": {"lead_id_1", "email_1", "phone_1", "created_at_-1", "status_1",
+                          "payment.status_1", "status_1_payment.status_1_created_at_-1",
+                          "payment_link_unique_ci"},
+                "users": {"email_1", "role_1", "is_active_1"},
+                "communications": {"sent_at_-1", "lead_id_1_sent_at_-1", "email_type_1", "status_1"},
+            }
+            if all(expected[c] <= existing.get(c, set()) for c in expected):
+                cls._indexes_ready = True
+                print("[MongoDB] [OK] Indexes already present")
+                return
+        except Exception:
+            pass  # fall through and create them the normal way
+
         try:
             # Gyms collection indexes
             await cls.db.gyms.create_index("gym_id", unique=True)

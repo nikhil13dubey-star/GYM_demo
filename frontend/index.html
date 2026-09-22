@@ -105,6 +105,7 @@
                         placeholder="Enter city, area, or 6-digit pincode (e.g., Mumbai)"
                         onkeypress="if(event.key === 'Enter') searchLocation()"
                         oninput="handleSearchInput(event)"
+                        onfocus="ensureCatalogue()"
                         autocomplete="off"
                     />
                     <!-- Custom suggestions dropdown -->
@@ -291,6 +292,27 @@
             } catch (error) {
                 console.error('Error fetching partners:', error);
                 return [];
+            }
+        }
+
+        // The full catalogue is only needed for offline search suggestions, so it is
+        // fetched the first time the user interacts with the search box — never on load.
+        let catalogueRequest = null;
+        function ensureCatalogue() {
+            if (!catalogueRequest) {
+                catalogueRequest = fetchAllGyms().then(all => { state.allGyms = all || []; });
+            }
+            return catalogueRequest;
+        }
+
+        async function fetchHomeData(lat, lon, limit = 20) {
+            try {
+                const response = await fetch(`${API_BASE}/api/home?lat=${lat}&lon=${lon}&limit=${limit}`);
+                if (!response.ok) throw new Error('home bootstrap failed');
+                return await response.json();
+            } catch (error) {
+                console.error('Error loading home data:', error);
+                return { gyms: [], partners: [] };
             }
         }
 
@@ -1270,6 +1292,7 @@
 
         // Show local suggestions from gym database with fuzzy search
         function showLocalSuggestions(query) {
+            ensureCatalogue();
             const queryLower = query.toLowerCase().trim();
 
             if (queryLower.length < 2) {
@@ -1506,15 +1529,11 @@
             // they are rendered as soon as the nearby search returns — they used to
             // wait on the full catalogue download, which only powers offline
             // search suggestions and is now loaded in the background.
-            const nearbyPromise = fetchNearbyGyms(DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lon, 20);
-            const partnersPromise = fetchPartners();
+            const home = await fetchHomeData(DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lon, 20);
 
-            fetchAllGyms().then(allGyms => { state.allGyms = allGyms || []; });
-            partnersPromise.then(partners => renderBrandFilters(partners || []));
-
-            const delhiGyms = await nearbyPromise;
-            state.filteredGyms = delhiGyms;
-            renderGymCards(delhiGyms, false);
+            state.filteredGyms = home.gyms || [];
+            renderGymCards(state.filteredGyms, false);
+            renderBrandFilters(home.partners || []);
 
             document.getElementById('gymsTitle').textContent = `Gyms near ${DEFAULT_LOCATION.city}`;
 
