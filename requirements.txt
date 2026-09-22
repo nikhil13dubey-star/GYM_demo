@@ -1,0 +1,12 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+pydantic[email]==2.5.0
+scipy==1.11.4
+requests==2.31.0
+motor==3.7.1
+pymongo==4.15.5
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.5.0
+python-dotenv==1.2.1
+sendgrid==6.11.0

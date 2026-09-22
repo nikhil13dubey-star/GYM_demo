@@ -1,0 +1,4074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Gym Habit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #f59e0b;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --bg-base: #f9fafb;
+            --bg-card: #ffffff;
+            --bg-hover: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+        }
+
+        /* Login Screen */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            padding: 48px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-xl);
+            max-width: 420px;
+            width: 100%;
+            border: 1px solid var(--border-light);
+        }
+
+        .login-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .header {
+            background: var(--bg-card);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 28px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Tabs */
+        /* SIDEBAR LAYOUT */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg-base);
+        }
+
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+        }
+
+        .sidebar-nav {
+            padding: 12px 0;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: rgba(255, 255, 255, 0.9);
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: #60a5fa;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 0;
+            width: calc(100% - 260px);
+        }
+
+        /* Hide old tabs styling */
+        .tabs {
+            display: none;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            letter-spacing: 0.3px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        th {
+            background: var(--bg-base);
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        tr:hover {
+            background: var(--bg-hover);
+        }
+
+        tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: capitalize;
+        }
+
+        .badge-new { background: #dbeafe; color: #1e40af; }
+        .badge-contacted { background: #fef3c7; color: #92400e; }
+        .badge-interested { background: #d1fae5; color: #065f46; }
+        .badge-not_interested { background: #fee2e2; color: #991b1b; }
+        .badge-closed { background: #e5e7eb; color: #374151; }
+        .badge-activated { background: #ede9fe; color: #5b21b6; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-link_shared { background: #dbeafe; color: #1e40af; }
+        .badge-paid { background: #d1fae5; color: #065f46; }
+        .badge-failed { background: #fee2e2; color: #991b1b; }
+
+        /* ============ Communications tab ============ */
+        .comms-pills { display: flex; gap: 8px; margin-bottom: 20px; }
+        .comms-pill {
+            padding: 10px 22px; border: 1px solid #e5e7eb; border-radius: 999px;
+            background: #ffffff; color: #374151; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.15s ease;
+        }
+        .comms-pill:hover { border-color: #0c53a0; color: #0c53a0; }
+        .comms-pill.active {
+            background: linear-gradient(135deg, #0c53a0 0%, #0a4485 100%);
+            color: #ffffff; border-color: #0a4485;
+        }
+        .comms-expand-icon { color: #9ca3af; font-size: 12px; transition: transform 0.15s ease; display: inline-block; }
+        tr.comms-row { cursor: pointer; }
+        tr.comms-row:hover { background: #f8fafc; }
+        tr.comms-row.open .comms-expand-icon { transform: rotate(90deg); }
+        tr.comms-detail-row > td { background: #f8fafc; padding: 0 16px 16px 44px; }
+        .comms-timeline { margin-top: 8px; }
+        .comms-timeline-item {
+            background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px;
+            padding: 14px 18px; margin-bottom: 10px;
+        }
+        .comms-timeline-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+        .comms-timeline-meta { color: #6b7280; font-size: 13px; line-height: 1.7; }
+        .comms-timeline-meta strong { color: #374151; font-weight: 600; }
+        .badge-sent { background: #d1fae5; color: #065f46; }
+        .badge-auto { background: #ede9fe; color: #5b21b6; }
+        .badge-manual { background: #dbeafe; color: #1e40af; }
+        .comms-type-badge { background: #f3f4f6; color: #374151; }
+        .comms-from-note {
+            background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 10px;
+            padding: 14px 18px; margin-bottom: 20px; color: #374151; font-size: 14px;
+        }
+        .comms-lock {
+            margin-left: 8px; font-size: 12px; color: #6b7280;
+            background: #f3f4f6; border-radius: 6px; padding: 3px 10px;
+        }
+        .comms-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap: 20px; }
+        .comms-card {
+            background: #ffffff; border: 1px solid #e5e7eb; border-radius: 14px;
+            padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .comms-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+        .comms-card-title { font-size: 17px; font-weight: 700; color: #111827; }
+        .comms-card-purpose { color: #6b7280; font-size: 13px; margin-bottom: 14px; line-height: 1.5; }
+        .comms-card dl { margin: 0; }
+        .comms-card dt { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin: 12px 0 4px; }
+        .comms-card dd { margin: 0; color: #374151; font-size: 13.5px; line-height: 1.55; }
+        .comms-card dd ul { margin: 0; padding-left: 18px; }
+        .comms-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .comms-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;
+            border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 12.5px; font-weight: 500;
+        }
+        .comms-chip button {
+            border: none; background: #dbeafe; color: #1e40af; border-radius: 50%;
+            width: 18px; height: 18px; line-height: 1; font-size: 12px; cursor: pointer;
+        }
+        .comms-chip button:hover { background: #fee2e2; color: #991b1b; }
+        .comms-chip-empty { color: #9ca3af; font-size: 13px; font-style: italic; }
+        .comms-cc-add { display: flex; gap: 8px; margin-top: 10px; }
+        .comms-cc-add input {
+            flex: 1; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px;
+        }
+        .comms-cc-add input:focus { outline: none; border-color: #0c53a0; }
+        .comms-preview-subject { margin-bottom: 8px; color: #374151; font-size: 14px; }
+        .comms-preview-note { color: #9ca3af; font-size: 12px; margin-bottom: 12px; }
+        .comms-preview-frame { width: 100%; height: 520px; border: 1px solid #e5e7eb; border-radius: 10px; background: #f5f5f5; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+        }
+
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-base);
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 24px;
+            border-top: 2px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* Filters */
+        .filters {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+        .filters .filter-field { min-width: 0; }
+        .filters label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .filters input,
+        .filters select {
+            width: 100%;
+            height: 44px;
+            padding: 0 12px;
+            font-size: 14px;
+            line-height: normal;
+        }
+        /* From/To stay together as one paired cell */
+        .filter-daterange {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .filter-actions { display: flex; align-items: flex-end; }
+        .filter-actions .btn { height: 44px; white-space: nowrap; }
+        @media (max-width: 992px) {
+            .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .filter-daterange { grid-column: span 2; }
+        }
+        @media (max-width: 560px) {
+            .filters { grid-template-columns: 1fr; }
+            .filter-daterange { grid-column: span 1; }
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        /* Audit Trail */
+        .audit-item {
+            background: var(--bg-base);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .audit-item.status_change {
+            border-left-color: var(--primary);
+        }
+
+        .audit-item.payment_update {
+            border-left-color: var(--success);
+        }
+
+        .audit-item.plan_change {
+            border-left-color: var(--secondary);
+        }
+
+        .audit-item.comment_added {
+            border-left-color: var(--warning);
+        }
+
+        .audit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .audit-action {
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: capitalize;
+        }
+
+        .audit-timestamp {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .audit-user {
+            font-size: 13px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .audit-details {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .audit-change {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .audit-change .old-value {
+            color: var(--danger);
+            text-decoration: line-through;
+        }
+
+        .audit-change .new-value {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 2000;
+        }
+
+        .toast.active {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            padding: 16px;
+            background: var(--bg-base);
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .comment-item {
+            padding: 12px;
+            background: var(--bg-base);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .comment-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .audit-item {
+            padding: 12px;
+            border-left: 3px solid var(--primary);
+            background: var(--bg-base);
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+
+        .audit-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-card">
+        <h1 class="login-title">Gym Habit Admin</h1>
+        <p class="login-subtitle">Sign in to manage leads and users</p>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" required placeholder="admin@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        </form>
+    </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboardScreen" class="dashboard">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Gym Habit</h2>
+            <div class="sidebar-subtitle">Admin Panel</div>
+        </div>
+        <nav class="sidebar-nav">
+            <button class="sidebar-item active" onclick="switchTab('leads')">
+                <span class="sidebar-icon">📝</span>
+                <span>Leads</span>
+            </button>
+            <button class="sidebar-item" onclick="switchTab('gyms')">
+                <span class="sidebar-icon">🏢</span>
+                <span>Gyms</span>
+            </button>
+            <button class="sidebar-item" onclick="switchTab('partners')">
+                <span class="sidebar-icon">🔗</span>
+                <span>Partners</span>
+            </button>
+            <button class="sidebar-item" id="sidebarUsersTab" style="display: none;" onclick="switchTab('users')">
+                <span class="sidebar-icon">👤</span>
+                <span>Users</span>
+            </button>
+            <button class="sidebar-item" id="sidebarCommsTab" style="display: none;" onclick="switchTab('communications')">
+                <span class="sidebar-icon">✉️</span>
+                <span>Communications</span>
+            </button>
+        </nav>
+        <div style="position: absolute; bottom: 0; width: 100%; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="padding: 16px 20px;">
+                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.7); margin-bottom: 8px;" id="sidebarUserName">Admin</div>
+                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.5); margin-bottom: 12px;" id="sidebarUserRole">admin</div>
+                <button class="btn btn-sm" onclick="logout()" style="background: rgba(255, 255, 255, 0.1); color: white; width: 100%; border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <span style="margin-right: 8px;">🚪</span> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="container header-content">
+                <div>
+                    <h1 style="font-size: 24px; font-weight: 700; color: var(--primary);">Dashboard</h1>
+                </div>
+                <div class="user-info" style="display: none;">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px;" id="userName">Admin</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);" id="userRole">admin</div>
+                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="statTotalLeads">0</div>
+                <div class="stat-label">Total Leads</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statNewLeads">0</div>
+                <div class="stat-label">New Leads</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statPaidLeads">0</div>
+                <div class="stat-label">Paid</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statTotalGyms">0</div>
+                <div class="stat-label">Total Gyms</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('leads')">Leads</button>
+            <button class="tab" onclick="switchTab('gyms')">Gyms</button>
+            <button class="tab" onclick="switchTab('partners')">Partners</button>
+            <button class="tab" onclick="switchTab('users')" id="usersTab" style="display: none;">Users</button>
+            <button class="tab" onclick="switchTab('communications')" id="commsTab" style="display: none;">Communications</button>
+        </div>
+
+        <!-- Tab: Leads -->
+        <div id="tabLeads" class="tab-content active">
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filter-field">
+                    <label>Assigned To</label>
+                    <select id="filterAssigned" onchange="loadLeads()">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="filter-field">
+                    <label>Status</label>
+                    <select id="filterStatus" onchange="loadLeads()">
+                        <option value="">All</option>
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="interested">Interested</option>
+                        <option value="not_interested">Not Interested</option>
+                        <option value="closed">Closed</option>
+                        <option value="activated">Activated</option>
+                    </select>
+                </div>
+                <div class="filter-field">
+                    <label>Payment Status</label>
+                    <select id="filterPayment" onchange="loadLeads()">
+                        <option value="">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="link_shared">Link Shared</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                <div class="filter-field">
+                    <label>City</label>
+                    <input type="text" id="filterCity" placeholder="e.g., Mumbai" onchange="loadLeads()">
+                </div>
+                <div class="filter-field filter-daterange">
+                    <div>
+                        <label>From Date</label>
+                        <input type="date" id="filterFromDate" onchange="loadLeads()">
+                    </div>
+                    <div>
+                        <label>To Date</label>
+                        <input type="date" id="filterToDate" onchange="loadLeads()">
+                    </div>
+                </div>
+                <div class="filter-field filter-actions">
+                    <button class="btn btn-success" onclick="exportCSV()">📊 Export CSV</button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Lead ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Gym</th>
+                            <th>Center Code</th>
+                            <th>Plan</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Assigned To</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leadsTable">
+                        <tr><td colspan="11" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+        </div>
+
+        <!-- Tab: Users -->
+        <!-- Tab: Gyms -->
+        <div id="tabGyms" class="tab-content">
+            <div style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-primary" id="addGymBtn" onclick="showAddGymModal()">➕ Add Gym</button>
+                <button class="btn btn-secondary" id="uploadGymsBtn" onclick="showUploadGymsModal()">📁 Upload CSV</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Gym Name</th>
+                            <th>Partner</th>
+                            <th>City</th>
+                            <th>Address</th>
+                            <th>Amenities</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gymsTable">
+                        <tr><td colspan="6" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Partners -->
+        <div id="tabPartners" class="tab-content">
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-primary" id="addPartnerBtn" onclick="showAddPartnerModal()">➕ Add Partner</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Partner Name</th>
+                            <th>Total Gyms</th>
+                            <th>Cities</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="partnersTable">
+                        <tr><td colspan="4" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Users -->
+        <div id="tabUsers" class="tab-content">
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="showCreateUserModal()">➕ Create User</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable">
+                        <tr><td colspan="6" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Communications (admin only) -->
+        <div id="tabCommunications" class="tab-content">
+            <!-- Sub-navigation -->
+            <div class="comms-pills">
+                <button class="comms-pill active" id="commsPillLog" onclick="switchCommsView('log')">📋 Log</button>
+                <button class="comms-pill" id="commsPillRules" onclick="switchCommsView('rules')">⚙️ Email Rules</button>
+            </div>
+
+            <!-- Section: Log (grouped by lead) -->
+            <div id="commsViewLog">
+                <div class="filters">
+                    <div class="filter-field">
+                        <label>Email Type</label>
+                        <select id="commsFilterType" onchange="loadCommunications()">
+                            <option value="">All</option>
+                            <option value="LEAD_ACKNOWLEDGEMENT">Lead Acknowledgement</option>
+                            <option value="NO_RESPONSE_FOLLOWUP">No Response Follow-up</option>
+                            <option value="PAYMENT_CONFIRMATION">Payment Confirmation</option>
+                            <option value="INTERIM_INFO">Interim Info</option>
+                            <option value="NO_INTEREST_CLOSURE">No Interest Closure</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label>Status</label>
+                        <select id="commsFilterStatus" onchange="loadCommunications()">
+                            <option value="">All</option>
+                            <option value="sent">Sent</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label>Search</label>
+                        <input type="text" id="commsSearch" placeholder="Lead ID, name or email" onchange="loadCommunications()">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 28px;"></th>
+                                <th>Lead ID</th>
+                                <th>Customer</th>
+                                <th>Email</th>
+                                <th>Emails Sent</th>
+                                <th>Types</th>
+                                <th>Last Activity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="commsTable">
+                            <tr><td colspan="7" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section: Email Rules (playbook + CC management) -->
+            <div id="commsViewRules" style="display: none;">
+                <div class="comms-from-note">
+                    All portal emails are sent from
+                    <strong id="commsFromEmail">…</strong>
+                    <span class="comms-lock" title="The From address is system-managed (SendGrid verified sender). It cannot be changed from the portal.">🔒 system-managed</span>
+                </div>
+                <div id="commsRulesCards" class="comms-cards">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+        </div><!-- Close container -->
+    </div><!-- Close main-content -->
+</div><!-- Close dashboard -->
+
+<!-- Email Template Preview Modal -->
+<div id="commsPreviewModal" class="modal">
+    <div class="modal-content" style="max-width: 760px;">
+        <div class="modal-header">
+            <h2 id="commsPreviewTitle">Email Preview</h2>
+            <button class="close-btn" onclick="document.getElementById('commsPreviewModal').classList.remove('active')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="comms-preview-subject">Subject: <strong id="commsPreviewSubject"></strong></div>
+            <div class="comms-preview-note" id="commsPreviewNote"></div>
+            <iframe id="commsPreviewFrame" class="comms-preview-frame" sandbox=""></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- Lead Detail Modal -->
+<div id="leadModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="leadModalTitle">Lead Details</h2>
+            <button class="close-btn" onclick="closeLeadModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="leadModalBody">
+            Loading...
+        </div>
+    </div>
+</div>
+
+<!-- Add Gym Modal -->
+<div id="addGymModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Gym</h2>
+            <button class="close-btn" onclick="closeAddGymModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addGymForm">
+                <div class="form-group">
+                    <label>Gym Name *</label>
+                    <input type="text" id="gymName" required>
+                </div>
+                <div class="form-group">
+                    <label>Partner *</label>
+                    <select id="gymPartner" required>
+                        <option value="">Select partner...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Address *</label>
+                    <textarea id="gymAddress" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>City *</label>
+                    <input type="text" id="gymCity" required>
+                </div>
+                <div class="form-group">
+                    <label>State *</label>
+                    <input type="text" id="gymState" required>
+                </div>
+                <div class="form-group">
+                    <label>PIN Code *</label>
+                    <input type="text" id="gymPincode" pattern="[0-9]{6}" maxlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label>Latitude *</label>
+                    <input type="number" id="gymLatitude" step="any" required placeholder="e.g., 19.0760">
+                </div>
+                <div class="form-group">
+                    <label>Longitude *</label>
+                    <input type="number" id="gymLongitude" step="any" required placeholder="e.g., 72.8777">
+                </div>
+                <div class="form-group">
+                    <label>Amenities (comma-separated)</label>
+                    <input type="text" id="gymAmenities" placeholder="Cardio, Weights, Yoga, Swimming">
+                </div>
+                <div class="form-group">
+                    <label>Monthly Subscription Amount (₹) *</label>
+                    <input type="number" id="gymSubscriptionAmount" min="0" step="1" required placeholder="e.g., 2499">
+                    <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Base monthly price used for auto-calculating plans</small>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="customPlansToggle" onchange="toggleCustomPlans('add')" style="width: auto; margin: 0;">
+                        <span>Set Custom Plan Pricing (Optional)</span>
+                    </label>
+                    <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Check to override auto-calculated plans with custom pricing</small>
+                </div>
+
+                <div id="customPlansSection" style="display: none; padding: 16px; background: var(--bg-base); border-radius: 8px; margin-top: 12px;">
+                    <h4 style="margin-bottom: 12px; font-size: 14px; color: var(--text-primary);">Custom Subscription Plans</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>1 Month - Total Price (₹)</label>
+                            <input type="number" id="plan1Month" min="0" step="1" placeholder="e.g., 2499">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>3 Months - Total Price (₹)</label>
+                            <input type="number" id="plan3Months" min="0" step="1" placeholder="e.g., 6999">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>6 Months - Total Price (₹)</label>
+                            <input type="number" id="plan6Months" min="0" step="1" placeholder="e.g., 13499">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>12 Months - Total Price (₹)</label>
+                            <input type="number" id="plan12Months" min="0" step="1" placeholder="e.g., 24999">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Gym Icon (Optional)</label>
+                    <div style="display: flex; gap: 12px; align-items: start;">
+                        <div style="flex: 1;">
+                            <input type="text" id="gymIconEmoji" placeholder="Enter emoji (e.g., 🏋️, 💪, 🏃)" maxlength="2" style="font-size: 18px;">
+                            <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Enter an emoji</small>
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="file" id="gymIconFile" accept="image/*" style="font-size: 13px;">
+                            <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Or upload an image</small>
+                        </div>
+                    </div>
+                    <div id="gymIconPreview" style="margin-top: 12px; display: none;">
+                        <strong style="font-size: 13px; color: var(--text-secondary);">Preview:</strong>
+                        <div id="gymIconPreviewContent" style="margin-top: 8px; padding: 12px; background: var(--bg-base); border-radius: 6px; display: inline-block;"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeAddGymModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitAddGym()">Add Gym</button>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Gyms CSV Modal -->
+<div id="uploadGymsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Upload Gyms from CSV</h2>
+            <button class="close-btn" onclick="closeUploadGymsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-base); border-radius: 6px;">
+                <h4 style="margin-bottom: 8px;">CSV Format Requirements:</h4>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+                    Your CSV file should have the following columns:
+                </p>
+                <code style="display: block; background: white; padding: 12px; border-radius: 4px; font-size: 11px; overflow-x: auto;">
+                    Sr. No,Gym_Name,Provider,Center_Code,Center_type,Address,City,State,Latitude,Longitude,Pincode,Plan name,MRP,Discount,Price,Amenities
+                </code>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                    <strong>One row = one plan.</strong> Multiple rows sharing the same <strong>Center_Code</strong> are grouped into a single gym with several plans.<br>
+                    <strong>Center_Code:</strong> Required — rows without it are skipped.<br>
+                    <strong>Provider:</strong> Partner name (defaults to "Cult" if blank).<br>
+                    <strong>Plan name / MRP / Discount / Price:</strong> One membership plan per row (Price = actual selling price; the lowest Price becomes the gym's "from" amount).<br>
+                    <strong>Amenities:</strong> Separated by new lines or "•" bullets within the cell.
+                </p>
+            </div>
+            <div class="form-group">
+                <label>Select CSV File *</label>
+                <input type="file" id="gymsCSVFile" accept=".csv" style="padding: 10px;">
+            </div>
+            <div id="uploadProgress" style="display: none; margin-top: 16px;">
+                <div style="font-size: 14px; margin-bottom: 8px; color: var(--text-secondary);">Uploading...</div>
+                <div style="background: var(--bg-base); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="uploadProgressBar" style="background: var(--primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeUploadGymsModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitUploadGyms()">Upload</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Partner Modal -->
+<div id="addPartnerModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Partner</h2>
+            <button class="close-btn" onclick="closeAddPartnerModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addPartnerForm">
+                <div class="form-group">
+                    <label>Partner Name *</label>
+                    <input type="text" id="partnerName" required placeholder="e.g., Gold's Gym">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="partnerDescription" rows="3" placeholder="Brief description about the partner"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Partner Icon (Optional)</label>
+                    <div style="display: flex; gap: 12px; align-items: start;">
+                        <div style="flex: 1;">
+                            <input type="text" id="partnerIconEmoji" placeholder="Enter emoji (e.g., 🤝, 🏢, 💼)" maxlength="2" style="font-size: 18px;">
+                            <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Enter an emoji</small>
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="file" id="partnerIconFile" accept="image/*" style="font-size: 13px;">
+                            <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Or upload an image</small>
+                        </div>
+                    </div>
+                    <div id="partnerIconPreview" style="margin-top: 12px; display: none;">
+                        <strong style="font-size: 13px; color: var(--text-secondary);">Preview:</strong>
+                        <div id="partnerIconPreviewContent" style="margin-top: 8px; padding: 12px; background: var(--bg-base); border-radius: 6px; display: inline-block;"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeAddPartnerModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitAddPartner()">Add Partner</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Gym Modal -->
+<div id="editGymModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Gym</h2>
+            <button class="close-btn" onclick="closeEditGymModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editGymForm">
+                <input type="hidden" id="editGymId">
+                <div class="form-group">
+                    <label>Gym Name *</label>
+                    <input type="text" id="editGymName" required>
+                </div>
+                <div class="form-group">
+                    <label>Partner *</label>
+                    <select id="editGymPartner" required>
+                        <option value="">Select partner...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Address *</label>
+                    <textarea id="editGymAddress" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>City *</label>
+                    <input type="text" id="editGymCity" required>
+                </div>
+                <div class="form-group">
+                    <label>State *</label>
+                    <input type="text" id="editGymState" required>
+                </div>
+                <div class="form-group">
+                    <label>PIN Code *</label>
+                    <input type="text" id="editGymPincode" pattern="[0-9]{6}" maxlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label>Latitude *</label>
+                    <input type="number" id="editGymLatitude" step="any" required placeholder="e.g., 19.0760">
+                </div>
+                <div class="form-group">
+                    <label>Longitude *</label>
+                    <input type="number" id="editGymLongitude" step="any" required placeholder="e.g., 72.8777">
+                </div>
+                <div class="form-group">
+                    <label>Amenities (comma-separated)</label>
+                    <input type="text" id="editGymAmenities" placeholder="Cardio, Weights, Yoga, Swimming">
+                </div>
+                <div class="form-group">
+                    <label>Monthly Subscription Amount (₹) *</label>
+                    <input type="number" id="editGymSubscriptionAmount" min="0" step="1" required placeholder="e.g., 2499">
+                    <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Base monthly price used for auto-calculating plans</small>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="editCustomPlansToggle" onchange="toggleCustomPlans('edit')" style="width: auto; margin: 0;">
+                        <span>Set Custom Plan Pricing (Optional)</span>
+                    </label>
+                    <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Check to override auto-calculated plans with custom pricing</small>
+                </div>
+
+                <div id="editCustomPlansSection" style="display: none; padding: 16px; background: var(--bg-base); border-radius: 8px; margin-top: 12px;">
+                    <h4 style="margin-bottom: 12px; font-size: 14px; color: var(--text-primary);">Custom Subscription Plans</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>1 Month - Total Price (₹)</label>
+                            <input type="number" id="editPlan1Month" min="0" step="1" placeholder="e.g., 2499">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>3 Months - Total Price (₹)</label>
+                            <input type="number" id="editPlan3Months" min="0" step="1" placeholder="e.g., 6999">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>6 Months - Total Price (₹)</label>
+                            <input type="number" id="editPlan6Months" min="0" step="1" placeholder="e.g., 13499">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>12 Months - Total Price (₹)</label>
+                            <input type="number" id="editPlan12Months" min="0" step="1" placeholder="e.g., 24999">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Gym Icon (Optional)</label>
+                    <div style="display: flex; gap: 12px; align-items: start;">
+                        <div style="flex: 1;">
+                            <input type="text" id="editGymIconEmoji" placeholder="Enter emoji (e.g., 🏋️, 💪, 🏃)" maxlength="2" style="font-size: 18px;">
+                            <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Enter an emoji</small>
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="file" id="editGymIconFile" accept="image/*" style="font-size: 13px;">
+                            <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Or upload an image</small>
+                        </div>
+                    </div>
+                    <div id="editGymIconPreview" style="margin-top: 12px; display: none;">
+                        <strong style="font-size: 13px; color: var(--text-secondary);">Preview:</strong>
+                        <div id="editGymIconPreviewContent" style="margin-top: 8px; padding: 12px; background: var(--bg-base); border-radius: 6px; display: inline-block;"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeEditGymModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitEditGym()">Update Gym</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Partner Modal -->
+<div id="editPartnerModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Partner</h2>
+            <button class="close-btn" onclick="closeEditPartnerModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editPartnerForm">
+                <input type="hidden" id="editPartnerOldName">
+                <div class="form-group">
+                    <label>Partner Name *</label>
+                    <input type="text" id="editPartnerName" required placeholder="e.g., Gold's Gym">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editPartnerDescription" rows="3" placeholder="Brief description about the partner"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Partner Icon (Optional)</label>
+                    <div style="display: flex; gap: 12px; align-items: start;">
+                        <div style="flex: 1;">
+                            <input type="text" id="editPartnerIconEmoji" placeholder="Enter emoji (e.g., 🤝, 🏢, 💼)" maxlength="2" style="font-size: 18px;">
+                            <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Enter an emoji</small>
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="file" id="editPartnerIconFile" accept="image/*" style="font-size: 13px;">
+                            <small style="display: block; margin-top: 4px; color: var(--text-secondary);">Or upload an image</small>
+                        </div>
+                    </div>
+                    <div id="editPartnerIconPreview" style="margin-top: 12px; display: none;">
+                        <strong style="font-size: 13px; color: var(--text-secondary);">Preview:</strong>
+                        <div id="editPartnerIconPreviewContent" style="margin-top: 8px; padding: 12px; background: var(--bg-base); border-radius: 6px; display: inline-block;"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeEditPartnerModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitEditPartner()">Update Partner</button>
+        </div>
+    </div>
+</div>
+
+<!-- Create User Modal -->
+<div id="createUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Create New User</h2>
+            <button class="close-btn" onclick="closeCreateUserModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="createUserForm">
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone (optional)</label>
+                    <input type="tel" name="phone" placeholder="e.g. 9876543210">
+                </div>
+                <div class="form-group">
+                    <label>Password * (min 8 characters)</label>
+                    <input type="password" name="password" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label>Role *</label>
+                    <select name="role" required>
+                        <option value="agent">Agent (Manage own leads)</option>
+                        <option value="admin">Admin (Full access)</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeCreateUserModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="createUser()">Create User</button>
+        </div>
+    </div>
+</div>
+
+<!-- Update Status Modal -->
+<div id="updateStatusModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Update Lead Status</h2>
+            <button class="close-btn" onclick="closeUpdateStatusModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="updateStatusForm">
+                <div class="form-group">
+                    <label>New Status *</label>
+                    <select id="newStatus" required>
+                        <option value="">Select status...</option>
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="interested">Interested</option>
+                        <option value="not_interested">Not Interested</option>
+                        <option value="closed">Closed</option>
+                        <option value="activated">Activated</option>
+                    </select>
+                    <small id="statusModalNote" style="display:none; margin-top:6px; color:var(--text-secondary);"></small>
+                </div>
+                <div class="form-group">
+                    <label>Reason (optional)</label>
+                    <textarea id="statusReason" rows="3" placeholder="Why is the status being changed?"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeUpdateStatusModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitStatusUpdate()">Update Status</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Comment Modal -->
+<div id="addCommentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add Internal Comment</h2>
+            <button class="close-btn" onclick="closeAddCommentModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addCommentForm">
+                <div class="form-group">
+                    <label>Comment *</label>
+                    <textarea id="commentText" rows="4" required placeholder="Enter your comment here..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeAddCommentModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitComment()">Add Comment</button>
+        </div>
+    </div>
+</div>
+
+<!-- Update Payment Modal -->
+<div id="updatePaymentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Update Payment Details</h2>
+            <button class="close-btn" onclick="closeUpdatePaymentModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="updatePaymentForm">
+                <div class="form-group">
+                    <label>Payment Status *</label>
+                    <select id="paymentStatus" required onchange="toggleReferenceIdField()">
+                        <option value="">Select status...</option>
+                        <option value="pending">Pending</option>
+                        <option value="link_shared">Link Shared</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount (₹)</label>
+                    <input type="number" id="paymentAmount" placeholder="e.g., 14999">
+                </div>
+                <div class="form-group">
+                    <label>Reference ID</label>
+                    <input type="text" id="paymentLink" placeholder="Select status 'Paid' to enter Reference ID" disabled oninput="onReferenceIdInput()">
+                    <small id="paymentLinkHint" style="display: block; margin-top: 4px; color: var(--text-secondary);">Razorpay transaction ID — only entered when status is <strong>Paid</strong>; must be unique across all leads</small>
+                    <small id="paymentLinkError" style="display: none; margin-top: 4px; color: var(--danger); font-weight: 500;"></small>
+                </div>
+                <div class="form-group">
+                    <label>Recon ID</label>
+                    <input type="text" id="paymentReconId" readonly placeholder="Auto-generated when Reference ID is valid" style="background: var(--bg-base); color: var(--text-secondary); cursor: not-allowed;">
+                    <small id="paymentReconIdHint" style="display: block; margin-top: 4px; color: var(--text-secondary);">Unique series ID — auto-generated when status is Paid AND Reference ID is unique</small>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeUpdatePaymentModal()">Cancel</button>
+            <button class="btn btn-success" onclick="submitPaymentUpdate()">Update Payment</button>
+        </div>
+    </div>
+</div>
+
+<!-- Invoice Modal -->
+<div id="invoiceModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Invoice</h2>
+            <button class="close-btn" onclick="closeInvoiceModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="invoiceForm">
+                <div class="form-group">
+                    <label>Recon ID</label>
+                    <input type="text" id="invoiceReconId" readonly style="background: var(--bg-base); color: var(--text-secondary); cursor: not-allowed;">
+                    <small style="display: block; margin-top: 4px; color: var(--text-secondary);">The Recon ID saved for this lead (read-only).</small>
+                </div>
+                <div class="form-group">
+                    <label>Invoice Number *</label>
+                    <input type="text" id="invoiceNumber" placeholder="Enter invoice number">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeInvoiceModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitInvoice()">Save Invoice</button>
+        </div>
+    </div>
+</div>
+
+<!-- Update Plan Modal -->
+<div id="updatePlanModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Change Membership Plan</h2>
+            <button class="close-btn" onclick="closeUpdatePlanModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="updatePlanForm">
+                <div class="form-group">
+                    <label>New Plan *</label>
+                    <select id="newPlan" required>
+                        <option value="">Loading plans...</option>
+                    </select>
+                    <small id="newPlanHint" style="display: block; margin-top: 4px; color: var(--text-secondary);">Plans available for this gym</small>
+                </div>
+                <div class="form-group">
+                    <label>Reason (optional)</label>
+                    <textarea id="planReason" rows="3" placeholder="Why is the plan being changed?"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeUpdatePlanModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitPlanUpdate()">Update Plan</button>
+        </div>
+    </div>
+</div>
+
+<!-- Audit Trail Modal -->
+<div id="auditTrailModal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-header">
+            <h2>Complete Audit Trail</h2>
+            <button class="close-btn" onclick="closeAuditTrailModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="auditTrailContent" style="max-height: 500px; overflow-y: auto;">
+                Loading...
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="closeAuditTrailModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reassign Lead Modal (Admin only) -->
+<div id="reassignModal" class="modal">
+    <div class="modal-content" style="max-width: 480px;">
+        <div class="modal-header">
+            <h2>Reassign Lead</h2>
+            <button class="close-btn" onclick="closeReassignModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Assign this lead to:</label>
+            <select id="reassignAgent" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                <option value="">Loading users…</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeReassignModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitReassign()">Reassign</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+    // ──────────────────────────────────────────────────────────────────
+    // XSS DEFENSE — escape any untrusted text before injecting into innerHTML
+    // Lead names, emails, comments, etc. come from public form input and
+    // must NEVER be interpolated raw into HTML.
+    // ──────────────────────────────────────────────────────────────────
+    function escapeHtml(s) {
+        if (s === null || s === undefined) return '';
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+    // Convenience alias
+    const E = escapeHtml;
+
+    // Display name for an assigned agent: the part of the email before "@",
+    // prettified (dots/underscores -> spaces, each word capitalized).
+    //   meenakshi@example.com        -> "Meenakshi"
+    //   meenakshi.sharma@example.com -> "Meenakshi Sharma"
+    function agentName(email) {
+        if (!email) return '';
+        const local = String(email).split('@')[0];
+        return local
+            .split(/[._-]+/)
+            .filter(Boolean)
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+    }
+
+    let authToken = localStorage.getItem('authToken');
+    let currentUser = null;
+    let currentPage = 1;
+    let currentLeadId = null;
+    let currentLead = null;
+
+    // ============================================================================
+    // UTILITY: Convert UTC to IST (Indian Standard Time)
+    // ============================================================================
+    function convertToIST(utcDateString) {
+        const date = new Date(utcDateString);
+        // IST is UTC+5:30
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const istDate = new Date(date.getTime() + istOffset);
+        return istDate;
+    }
+
+    function formatISTDateTime(utcDateString) {
+        const istDate = convertToIST(utcDateString);
+        const options = {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        };
+        return istDate.toLocaleString('en-IN', options) + ' IST';
+    }
+
+    function formatISTDate(utcDateString) {
+        const istDate = convertToIST(utcDateString);
+        return istDate.toLocaleDateString('en-IN');
+    }
+
+    // Initialize
+    if (authToken) {
+        verifyToken();
+    } else {
+        showLogin();
+    }
+
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) throw new Error('Invalid credentials');
+
+            const data = await response.json();
+            authToken = data.access_token;
+            currentUser = data.user;
+            localStorage.setItem('authToken', authToken);
+
+            showDashboard();
+            await setupLeadFilter();
+            loadStats();
+            loadLeads();
+        } catch (error) {
+            showToast('Login failed: ' + error.message, 'error');
+        }
+    });
+
+    async function verifyToken() {
+        try {
+            const response = await fetch('/api/auth/me', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (!response.ok) throw new Error('Invalid token');
+
+            currentUser = await response.json();
+            showDashboard();
+            await setupLeadFilter();
+            loadStats();
+            loadLeads();
+        } catch (error) {
+            localStorage.removeItem('authToken');
+            showLogin();
+        }
+    }
+
+    function showLogin() {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('dashboardScreen').classList.remove('active');
+    }
+
+    function showDashboard() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardScreen').classList.add('active');
+
+        // Set user info in header
+        document.getElementById('userName').textContent = currentUser.name || currentUser.email;
+        document.getElementById('userRole').textContent = currentUser.role;
+        document.getElementById('userAvatar').textContent = (currentUser.name || currentUser.email)[0].toUpperCase();
+
+        // Set user info in sidebar
+        document.getElementById('sidebarUserName').textContent = currentUser.name || currentUser.email;
+        document.getElementById('sidebarUserRole').textContent = currentUser.role;
+
+        // Show/hide features based on role
+        if (currentUser.role === 'admin') {
+            // Admin can see and do everything
+            document.getElementById('usersTab').style.display = 'block';
+            document.getElementById('sidebarUsersTab').style.display = 'flex';
+            document.getElementById('commsTab').style.display = 'block';
+            document.getElementById('sidebarCommsTab').style.display = 'flex';
+            // Admin can add gyms and partners
+            if (document.getElementById('addGymBtn')) document.getElementById('addGymBtn').style.display = 'inline-block';
+            if (document.getElementById('uploadGymsBtn')) document.getElementById('uploadGymsBtn').style.display = 'inline-block';
+            if (document.getElementById('addPartnerBtn')) document.getElementById('addPartnerBtn').style.display = 'inline-block';
+        } else {
+            // Agent (support) - hide admin-only features
+            document.getElementById('usersTab').style.display = 'none';
+            document.getElementById('sidebarUsersTab').style.display = 'none';
+            document.getElementById('commsTab').style.display = 'none';
+            document.getElementById('sidebarCommsTab').style.display = 'none';
+            // Hide gym and partner management
+            if (document.getElementById('addGymBtn')) document.getElementById('addGymBtn').style.display = 'none';
+            if (document.getElementById('uploadGymsBtn')) document.getElementById('uploadGymsBtn').style.display = 'none';
+            if (document.getElementById('addPartnerBtn')) document.getElementById('addPartnerBtn').style.display = 'none';
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('authToken');
+        authToken = null;
+        currentUser = null;
+        showLogin();
+
+        // Call logout API (optional)
+        fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        }).catch(() => {});
+    }
+
+    // Stats
+    async function loadStats() {
+        try {
+            const response = await fetch('/api/admin/stats', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            const data = await response.json();
+
+            document.getElementById('statTotalLeads').textContent = data.total_leads || 0;
+            document.getElementById('statNewLeads').textContent = data.status_breakdown?.new || 0;
+            document.getElementById('statPaidLeads').textContent = data.payment_breakdown?.paid || 0;
+            document.getElementById('statTotalGyms').textContent = data.total_gyms || 0;
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+
+    // Populate the "Assigned To" filter based on role.
+    //  - Admin: dropdown of every active user (by name); defaults to "All".
+    //  - Agent: "My Leads" / "All Leads" keyed to own email; defaults to "My Leads"
+    //    (agents cannot list users, so no other-agent names are shown).
+    async function setupLeadFilter() {
+        const sel = document.getElementById('filterAssigned');
+        if (!sel || !currentUser) return;
+        if (currentUser.role === 'admin') {
+            try {
+                const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${authToken}` } });
+                const data = await res.json();
+                const opts = ['<option value="">All</option>'];
+                (data.users || [])
+                    .filter(u => u.is_active)
+                    .sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email))
+                    .forEach(u => {
+                        const label = E(u.name || agentName(u.email)) + (u.role === 'admin' ? ' (admin)' : '');
+                        opts.push(`<option value="${E(u.email)}">${label}</option>`);
+                    });
+                sel.innerHTML = opts.join('');
+            } catch (e) {
+                sel.innerHTML = '<option value="">All</option>';
+            }
+            sel.value = '';
+        } else {
+            sel.innerHTML =
+                `<option value="${E(currentUser.email)}">My Leads</option>` +
+                `<option value="">All Leads</option>`;
+            sel.value = currentUser.email;   // agents land on their own leads
+        }
+    }
+
+    // Leads
+    async function loadLeads(page = 1) {
+        currentPage = page;
+        const status = document.getElementById('filterStatus').value;
+        const payment = document.getElementById('filterPayment').value;
+        const city = document.getElementById('filterCity').value;
+        const assigned = document.getElementById('filterAssigned').value;
+        const fromDate = document.getElementById('filterFromDate').value;
+        const toDate = document.getElementById('filterToDate').value;
+
+        const params = new URLSearchParams({
+            page: page,
+            per_page: 20
+        });
+
+        if (status) params.append('status', status);
+        if (payment) params.append('payment_status', payment);
+        if (city) params.append('city', city);
+        if (assigned) params.append('assigned_to', assigned);
+        if (fromDate) params.append('from_date', fromDate);
+        if (toDate) params.append('to_date', toDate);
+
+        try {
+            const response = await fetch(`/api/admin/leads?${params}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            const data = await response.json();
+            renderLeads(data.leads);
+            renderPagination(data.page, data.pages);
+        } catch (error) {
+            document.getElementById('leadsTable').innerHTML =
+                '<tr><td colspan="11" style="text-align: center; color: red;">Error loading leads</td></tr>';
+        }
+    }
+
+    function renderLeads(leads) {
+        const tbody = document.getElementById('leadsTable');
+
+        if (!leads || leads.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">No leads found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = leads.map(lead => {
+            const formattedDateTime = formatISTDateTime(lead.created_at);
+            const assignedName = agentName(lead.assigned_to);
+            const assignedBadge = assignedName ? `<span class="badge badge-paid">${E(assignedName)}</span>` : '<span class="badge badge-pending">Unassigned</span>';
+            const centerCode = lead.center_code || '-';
+            return `
+            <tr>
+                <td>${E(lead.lead_id)}</td>
+                <td>${E(lead.full_name)}</td>
+                <td>${E(lead.phone)}</td>
+                <td>${E(lead.gym_name)}</td>
+                <td><strong style="color: #0056B3;">${E(centerCode)}</strong></td>
+                <td>${E(lead.preferred_plan)}</td>
+                <td><span class="badge badge-${E(lead.status)}">${E(lead.status)}</span></td>
+                <td><span class="badge badge-${E(lead.payment.status)}">${E(lead.payment.status)}</span></td>
+                <td>${assignedBadge}</td>
+                <td style="white-space: nowrap;">${formattedDateTime}</td>
+                <td><button class="btn btn-sm btn-primary" onclick="viewLead('${lead.lead_id}')">View</button></td>
+            </tr>
+            `;
+        }).join('');
+    }
+
+    function renderPagination(current, total) {
+        const pagination = document.getElementById('pagination');
+
+        if (total <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+
+        if (current > 1) {
+            html += `<button class="page-btn" onclick="loadLeads(${current - 1})">← Prev</button>`;
+        }
+
+        for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) {
+            html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="loadLeads(${i})">${i}</button>`;
+        }
+
+        if (current < total) {
+            html += `<button class="page-btn" onclick="loadLeads(${current + 1})">Next →</button>`;
+        }
+
+        pagination.innerHTML = html;
+    }
+
+    // View Lead
+    async function viewLead(leadId) {
+        currentLeadId = leadId;
+        document.getElementById('leadModal').classList.add('active');
+        document.getElementById('leadModalBody').innerHTML = '<div class="loading">Loading...</div>';
+
+        try {
+            const response = await fetch(`/api/admin/leads/${leadId}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            const lead = await response.json();
+            currentLead = lead;
+            renderLeadDetail(lead);
+            applyRoleAndOwnershipGating(lead);
+        } catch (error) {
+            document.getElementById('leadModalBody').innerHTML = '<p style="color: red;">Error loading lead details</p>';
+        }
+    }
+
+    // Apply role- and ownership-based gating to the lead detail action buttons.
+    //  - Admin: full access; audit + reassign visible; can act on any lead.
+    //  - Agent: audit trail hidden (no audit access). Can act ONLY on leads
+    //    assigned to them or still unassigned; otherwise all actions disabled (view-only).
+    function applyRoleAndOwnershipGating(lead) {
+        const isAdmin = currentUser.role === 'admin';
+        const auditBtn = document.getElementById('viewAuditBtn');
+        const reassignBtn = document.getElementById('reassignBtn');
+
+        // Audit trail = admin only
+        if (auditBtn) auditBtn.style.display = isAdmin ? 'inline-block' : 'none';
+        // Reassign = admin only
+        if (reassignBtn) reassignBtn.style.display = isAdmin ? 'inline-block' : 'none';
+
+        if (isAdmin) return;  // admins are never ownership-locked
+
+        const owner = lead.assigned_to || null;
+        const isMine = !owner || owner === currentUser.email;  // unassigned is claimable
+        if (!isMine) {
+            // Lead belongs to another agent → view only
+            const ids = ['updateStatusBtn', 'addCommentBtn', 'updatePaymentBtn', 'invoiceBtn', 'changePlanBtn'];
+            ids.forEach(id => {
+                const b = document.getElementById(id);
+                if (b) { b.disabled = true; b.title = 'Assigned to ' + owner; b.style.opacity = '0.5'; b.style.cursor = 'not-allowed'; }
+            });
+            document.querySelectorAll('.emailActionBtn').forEach(b => {
+                b.disabled = true; b.title = 'Assigned to ' + owner; b.style.opacity = '0.5'; b.style.cursor = 'not-allowed';
+            });
+            const notice = document.getElementById('ownershipNotice');
+            if (notice) {
+                notice.style.display = 'block';
+                notice.textContent = `This lead is assigned to ${agentName(owner)}. You can view it but only the assigned agent or an admin can make changes.`;
+            }
+        }
+    }
+
+    function renderLeadDetail(lead) {
+        document.getElementById('leadModalTitle').textContent = `Lead: ${lead.lead_id}`;
+
+        const html = `
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">${E(lead.full_name)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">${E(lead.email || 'N/A')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">${E(lead.phone)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">City</div>
+                    <div class="info-value">${E(lead.user_location?.city || 'N/A')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Gym</div>
+                    <div class="info-value">${E(lead.gym_name)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Partner</div>
+                    <div class="info-value">${E(lead.partner_name)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Plan</div>
+                    <div class="info-value">${E(lead.preferred_plan)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value"><span class="badge badge-${E(lead.status)}">${E(lead.status)}</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Payment Status</div>
+                    <div class="info-value"><span class="badge badge-${E(lead.payment.status)}">${E(lead.payment.status)}</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Payment Amount</div>
+                    <div class="info-value">₹${E(lead.payment.amount || 'N/A')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Reference ID</div>
+                    <div class="info-value">${E(lead.payment.payment_link || 'N/A')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Recon ID</div>
+                    <div class="info-value">${E(lead.payment.recon_id || 'N/A')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Invoice Number</div>
+                    <div class="info-value">${E(lead.payment.invoice_number || 'N/A')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Assigned To</div>
+                    <div class="info-value">${E(agentName(lead.assigned_to) || 'Unassigned')}</div>
+                </div>
+            </div>
+
+            <div id="ownershipNotice" style="display:none; margin-top:16px; padding:12px 16px; background:#FEF3C7; border-left:4px solid #F59E0B; border-radius:0 8px 8px 0; color:#92400E; font-size:14px;"></div>
+
+            <div class="section-title">Actions</div>
+            <div class="actions">
+                <button class="btn btn-sm btn-primary" id="updateStatusBtn" onclick="updateStatus()">Update Status</button>
+                <button class="btn btn-sm btn-secondary" id="addCommentBtn" onclick="addComment()">Add Comment</button>
+                <button class="btn btn-sm btn-success" id="updatePaymentBtn" onclick="updatePayment()">Update Payment</button>
+                <button class="btn btn-sm" id="invoiceBtn" style="background:#7C3AED;color:white;" onclick="openInvoiceModal()" ${(lead.payment?.status === 'paid' && lead.payment?.recon_id) ? '' : `disabled title="Available only when payment is Paid and a Recon ID exists"`}>Invoice</button>
+                <button class="btn btn-sm" id="changePlanBtn" onclick="updatePlan()">Change Plan</button>
+                <button class="btn btn-sm" id="viewAuditBtn" onclick="viewAudit()">View Audit Trail</button>
+                <button class="btn btn-sm" id="reassignBtn" style="display:none; background:#6366F1; color:white;" onclick="openReassignModal()">Reassign</button>
+            </div>
+
+            <div class="section-title" style="margin-top: 24px;">Email Actions</div>
+            <div class="actions" style="gap: 8px;">
+                <button class="btn btn-sm emailActionBtn" style="background: #F59E0B; color: white;" onclick="sendNoResponseEmail()" ${!lead.email ? 'disabled title="No email address"' : ''}>
+                    No Response Follow-up
+                </button>
+                <button class="btn btn-sm emailActionBtn" style="background: #10B981; color: white;" onclick="sendPaymentConfirmation()" ${(!lead.email || lead.payment?.status !== 'paid') ? `disabled title="${!lead.email ? 'No email address' : 'Mark payment as Paid first'}"` : ''}>
+                    Payment Confirmation
+                </button>
+                <button class="btn btn-sm emailActionBtn" style="background: #EF4444; color: white;" onclick="sendClosureEmail()" ${!lead.email ? 'disabled title="No email address"' : ''}>
+                    Close Lead (No Interest)
+                </button>
+                <button class="btn btn-sm emailActionBtn" style="background: #0c53a0; color: white;" onclick="sendInterimInfo()" ${(!lead.email || lead.payment?.status !== 'paid') ? `disabled title="${!lead.email ? 'No email address' : 'Available only when payment status is Paid'}"` : ''}>
+                    Send Interim Info
+                </button>
+            </div>
+
+            <div class="section-title" style="margin-top: 24px;">Comments (${lead.comments?.length || 0})</div>
+            <div id="commentsSection">
+                ${lead.comments?.map(c => `
+                    <div class="comment-item">
+                        <div class="comment-meta">${E(c.user)} • ${formatISTDateTime(c.timestamp)}</div>
+                        <div>${E(c.text)}</div>
+                    </div>
+                `).join('') || '<p style="color: var(--text-secondary);">No comments yet</p>'}
+            </div>
+        `;
+
+        document.getElementById('leadModalBody').innerHTML = html;
+    }
+
+    function closeLeadModal() {
+        document.getElementById('leadModal').classList.remove('active');
+        currentLeadId = null;
+        loadLeads(currentPage); // Refresh table to show updated assignment
+    }
+
+    // Update Status - Open Modal
+    function updateStatus() {
+        const sel = document.getElementById('newStatus');
+        const note = document.getElementById('statusModalNote');
+        const isPaid = currentLead && currentLead.payment && currentLead.payment.status === 'paid';
+        const isActivated = currentLead && currentLead.status === 'activated';
+        const activatedOpt = sel.querySelector('option[value="activated"]');
+
+        // Reset
+        Array.from(sel.options).forEach(o => { o.disabled = false; o.hidden = false; });
+        note.textContent = '';
+        note.style.display = 'none';
+
+        if (isActivated) {
+            // Final state — nothing changeable
+            Array.from(sel.options).forEach(o => { if (o.value) o.disabled = true; });
+            note.textContent = 'This lead is Activated (final state). Status can no longer be changed.';
+            note.style.display = 'block';
+        } else if (isPaid) {
+            // Only 'Activated' allowed once payment is paid
+            Array.from(sel.options).forEach(o => { if (o.value && o.value !== 'activated') o.disabled = true; });
+            note.textContent = "Payment is Paid — the only available status change is 'Activated'.";
+            note.style.display = 'block';
+        } else if (activatedOpt) {
+            // Not paid yet — 'Activated' cannot be set
+            activatedOpt.disabled = true;
+            activatedOpt.hidden = true;
+        }
+
+        document.getElementById('updateStatusModal').style.display = 'flex';
+        sel.value = '';
+        document.getElementById('statusReason').value = '';
+    }
+
+    function closeUpdateStatusModal() {
+        document.getElementById('updateStatusModal').style.display = 'none';
+    }
+
+    async function submitStatusUpdate() {
+        const status = document.getElementById('newStatus').value;
+        const reason = document.getElementById('statusReason').value;
+
+        if (!status) {
+            showToast('Please select a status', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('status', status);
+        if (reason) formData.append('reason', reason);
+
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/status`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${authToken}` },
+                body: formData
+            });
+
+            if (!response.ok) throw new Error('Failed to update status');
+
+            showToast('Status updated successfully', 'success');
+            closeUpdateStatusModal();
+            viewLead(currentLeadId);
+            loadLeads(currentPage);
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Add Comment - Open Modal
+    function addComment() {
+        document.getElementById('addCommentModal').style.display = 'flex';
+        document.getElementById('commentText').value = '';
+    }
+
+    function closeAddCommentModal() {
+        document.getElementById('addCommentModal').style.display = 'none';
+    }
+
+    async function submitComment() {
+        const comment = document.getElementById('commentText').value.trim();
+
+        if (!comment) {
+            showToast('Please enter a comment', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('comment', comment);
+
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/comments`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}` },
+                body: formData
+            });
+
+            if (!response.ok) throw new Error('Failed to add comment');
+
+            showToast('Comment added successfully', 'success');
+            closeAddCommentModal();
+            viewLead(currentLeadId);
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Update Payment - Open Modal
+    // Enable/disable Reference ID input based on payment status (only enabled when 'paid')
+    function toggleReferenceIdField() {
+        const status = document.getElementById('paymentStatus').value;
+        const refInput = document.getElementById('paymentLink');
+        const errEl = document.getElementById('paymentLinkError');
+        const reconInput = document.getElementById('paymentReconId');
+        const reconHint = document.getElementById('paymentReconIdHint');
+
+        if (status === 'paid') {
+            refInput.disabled = false;
+            refInput.placeholder = 'Razorpay Transaction ID';
+            // Re-trigger preview if there's already a value (from existing data or admin re-typing)
+            onReferenceIdInput();
+        } else {
+            refInput.disabled = true;
+            refInput.value = '';  // Clear any value the user might have typed
+            refInput.placeholder = "Select status 'Paid' to enter Reference ID";
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+            // Clear Recon ID preview/value because no recon will be generated for non-paid
+            reconInput.value = '';
+            reconInput.placeholder = 'Auto-generated when Reference ID is valid';
+            reconHint.textContent = 'Unique series ID — auto-generated when status is Paid AND Reference ID is unique';
+            reconHint.style.color = 'var(--text-secondary)';
+        }
+    }
+
+    // Debounced live preview of Recon ID + duplicate check as admin types Reference ID
+    let _reconPreviewTimer = null;
+    function onReferenceIdInput() {
+        const refInput = document.getElementById('paymentLink');
+        const reconInput = document.getElementById('paymentReconId');
+        const reconHint = document.getElementById('paymentReconIdHint');
+        const errEl = document.getElementById('paymentLinkError');
+        const status = document.getElementById('paymentStatus').value;
+
+        clearTimeout(_reconPreviewTimer);
+
+        // Don't preview unless status is paid (rule enforced)
+        if (status !== 'paid') return;
+
+        const refValue = refInput.value.trim();
+
+        // No reference id typed → clear preview state
+        if (!refValue) {
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+            reconInput.value = '';
+            reconInput.placeholder = 'Enter Reference ID to preview Recon ID';
+            reconHint.textContent = 'Unique series ID — auto-generated when status is Paid AND Reference ID is unique';
+            reconHint.style.color = 'var(--text-secondary)';
+            return;
+        }
+
+        // Debounce — wait for user to stop typing for 350ms before hitting backend
+        _reconPreviewTimer = setTimeout(async () => {
+            try {
+                const url = `/api/admin/recon-preview?reference_id=${encodeURIComponent(refValue)}&lead_id=${encodeURIComponent(currentLeadId)}`;
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                if (!response.ok) return;
+                const data = await response.json();
+
+                if (data.is_duplicate) {
+                    // Show duplicate error inline
+                    errEl.textContent = `⚠ This Reference ID is already used by lead ${data.duplicate_lead_id}. Please enter a unique value.`;
+                    errEl.style.display = 'block';
+                    reconInput.value = '';
+                    reconInput.placeholder = 'Will not be generated — duplicate Reference ID';
+                    reconHint.textContent = 'Recon ID will NOT be assigned because Reference ID is already in use elsewhere.';
+                    reconHint.style.color = 'var(--danger)';
+                } else {
+                    // Show predicted recon ID
+                    errEl.style.display = 'none';
+                    errEl.textContent = '';
+                    reconInput.value = data.predicted_recon_id;
+                    if (data.is_existing) {
+                        reconHint.textContent = '✓ Existing Recon ID — already assigned to this lead.';
+                        reconHint.style.color = 'var(--success)';
+                    } else {
+                        reconHint.textContent = `✓ Will be assigned as ${data.predicted_recon_id} on save.`;
+                        reconHint.style.color = 'var(--success)';
+                    }
+                }
+            } catch (err) {
+                console.warn('Recon preview failed:', err);
+            }
+        }, 350);
+    }
+
+    async function updatePayment() {
+        document.getElementById('updatePaymentModal').style.display = 'flex';
+        document.getElementById('paymentStatus').value = '';
+        document.getElementById('paymentAmount').value = '';
+        document.getElementById('paymentLink').value = '';
+        document.getElementById('paymentReconId').value = '';
+
+        // Pre-populate Reference ID and Recon ID from current lead so admin sees existing values
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            if (response.ok) {
+                const lead = await response.json();
+                const p = lead.payment || {};
+                if (p.status) document.getElementById('paymentStatus').value = p.status;
+                if (p.amount) document.getElementById('paymentAmount').value = p.amount;
+                if (p.payment_link) document.getElementById('paymentLink').value = p.payment_link;
+                if (p.recon_id) document.getElementById('paymentReconId').value = p.recon_id;
+            }
+        } catch (err) {
+            // Silent — modal still works for entry; pre-populate is best-effort
+            console.warn('Could not pre-populate payment modal:', err);
+        }
+
+        // Apply enable/disable rule based on the (pre-populated) status
+        toggleReferenceIdField();
+    }
+
+    function closeUpdatePaymentModal() {
+        document.getElementById('updatePaymentModal').style.display = 'none';
+    }
+
+    // Invoice — enter an invoice number; shows the saved Recon ID (read-only).
+    // Only reachable when payment is 'paid' AND a recon_id exists (button gated).
+    function openInvoiceModal() {
+        const p = (currentLead && currentLead.payment) || {};
+        document.getElementById('invoiceReconId').value = p.recon_id || '';
+        document.getElementById('invoiceNumber').value = p.invoice_number || '';
+        document.getElementById('invoiceModal').style.display = 'flex';
+    }
+
+    function closeInvoiceModal() {
+        document.getElementById('invoiceModal').style.display = 'none';
+    }
+
+    async function submitInvoice() {
+        const num = document.getElementById('invoiceNumber').value.trim();
+        if (!num) { showToast('Please enter an invoice number', 'error'); return; }
+        const fd = new FormData();
+        fd.append('invoice_number', num);
+        try {
+            const r = await fetch(`/api/admin/leads/${currentLeadId}/invoice`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}` },
+                body: fd
+            });
+            const d = await r.json();
+            if (!r.ok) throw new Error(d.detail || 'Failed to save invoice');
+            showToast('Invoice number saved', 'success');
+            closeInvoiceModal();
+            viewLead(currentLeadId);
+        } catch (e) {
+            showToast('Error: ' + e.message, 'error');
+        }
+    }
+
+    async function submitPaymentUpdate() {
+        const status = document.getElementById('paymentStatus').value;
+        const amount = document.getElementById('paymentAmount').value;
+        const link = document.getElementById('paymentLink').value;
+
+        if (!status) {
+            showToast('Please select a payment status', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('payment_status', status);
+        if (amount) formData.append('amount', amount);
+        if (link) formData.append('payment_link', link);
+
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/payment`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${authToken}` },
+                body: formData
+            });
+
+            if (!response.ok) {
+                // Surface backend validation message (e.g. duplicate Reference ID)
+                let detail = 'Failed to update payment';
+                try {
+                    const errBody = await response.json();
+                    if (errBody && errBody.detail) detail = errBody.detail;
+                } catch (_) { /* ignore parse errors */ }
+                throw new Error(detail);
+            }
+
+            showToast('Payment updated successfully', 'success');
+            closeUpdatePaymentModal();
+            viewLead(currentLeadId);
+            loadLeads(currentPage);
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Update Plan - Open Modal
+    async function updatePlan() {
+        // 1. Fetch the lead — block opening modal if payment is paid
+        let lead;
+        try {
+            const r = await fetch(`/api/admin/leads/${currentLeadId}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            lead = await r.json();
+        } catch (err) {
+            showToast('Could not load lead', 'error');
+            return;
+        }
+
+        if (lead.payment && lead.payment.status === 'paid') {
+            showToast('Cannot change plan — payment is already marked as Paid', 'error');
+            return;  // do NOT open the modal
+        }
+
+        // 2. Reset modal state
+        document.getElementById('updatePlanModal').style.display = 'flex';
+        document.getElementById('planReason').value = '';
+        const select = document.getElementById('newPlan');
+        const hint = document.getElementById('newPlanHint');
+        select.innerHTML = '<option value="">Loading plans for this gym…</option>';
+        select.disabled = true;
+        hint.textContent = 'Plans available for this gym';
+        hint.style.color = 'var(--text-secondary)';
+
+        // 3. Fetch the gym to get its actual plans
+        try {
+            const gymRes = await fetch(`/api/gyms/${lead.gym_id}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            if (!gymRes.ok) throw new Error('Gym not found');
+            const gym = await gymRes.json();
+
+            // Build dropdown options
+            let options = ['<option value="">Select plan...</option>'];
+            const spl = gym.subscription_plans_list;
+
+            if (Array.isArray(spl) && spl.length > 0) {
+                // Production-style: named plans like "Cultpass Elite || 12 Months"
+                spl.forEach(p => {
+                    const priceStr = p.price ? `₹${Number(p.price).toLocaleString('en-IN')}` : '';
+                    const discountStr = p.discount > 0 ? ` (${Math.round(p.discount * 100)}% off)` : '';
+                    const label = `${p.plan_name} — ${priceStr}${discountStr}`;
+                    const selected = (p.plan_name === lead.preferred_plan) ? ' selected' : '';
+                    options.push(`<option value="${p.plan_name.replace(/"/g, '&quot;')}"${selected}>${label}</option>`);
+                });
+                hint.textContent = `${spl.length} plan(s) available for this gym`;
+            } else if (gym.subscription_plans) {
+                // Legacy gyms: 1/3/6/12 month durations from auto-calculated subscription_plans
+                const durationLabels = {
+                    '1-month':  '1 Month',
+                    '3-month':  '3 Months',
+                    '6-month':  '6 Months',
+                    '12-month': '12 Months'
+                };
+                Object.entries(gym.subscription_plans).forEach(([key, plan]) => {
+                    const planLabel = durationLabels[key] || key;
+                    const priceStr = plan.total ? `₹${Number(plan.total).toLocaleString('en-IN')}` : '';
+                    const discountStr = plan.discount > 0 ? ` (${plan.discount}% off)` : '';
+                    const label = `${planLabel} — ${priceStr}${discountStr}`;
+                    const selected = (planLabel === lead.preferred_plan) ? ' selected' : '';
+                    options.push(`<option value="${planLabel}"${selected}>${label}</option>`);
+                });
+                hint.textContent = `${Object.keys(gym.subscription_plans).length} plan(s) available for this gym`;
+            } else {
+                hint.textContent = 'No plans configured for this gym';
+                hint.style.color = 'var(--danger)';
+            }
+
+            select.innerHTML = options.join('');
+            select.disabled = false;
+        } catch (err) {
+            select.innerHTML = '<option value="">Could not load plans</option>';
+            hint.textContent = 'Error loading gym plans';
+            hint.style.color = 'var(--danger)';
+        }
+    }
+
+    function closeUpdatePlanModal() {
+        document.getElementById('updatePlanModal').style.display = 'none';
+    }
+
+    async function submitPlanUpdate() {
+        const plan = document.getElementById('newPlan').value;
+        const reason = document.getElementById('planReason').value;
+
+        if (!plan) {
+            showToast('Please select a plan', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('new_plan', plan);
+        if (reason) formData.append('reason', reason);
+
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/plan`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${authToken}` },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to update plan');
+            }
+
+            showToast('Plan updated successfully', 'success');
+            closeUpdatePlanModal();
+            viewLead(currentLeadId);
+            loadLeads(currentPage);
+        } catch (error) {
+            console.error('Plan update error:', error);
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // View Audit - Open Modal
+    async function viewAudit() {
+        // Open modal
+        document.getElementById('auditTrailModal').style.display = 'flex';
+        document.getElementById('auditTrailContent').innerHTML = '<div class="loading">Loading audit trail...</div>';
+
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/audit`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            const data = await response.json();
+            const audit = data.audit_trail || [];
+
+            if (audit.length === 0) {
+                document.getElementById('auditTrailContent').innerHTML = '<div class="empty-state">No audit trail found for this lead.</div>';
+                return;
+            }
+
+            // Format audit trail with proper UI
+            const html = audit.map(entry => {
+                const timestamp = formatISTDateTime(entry.timestamp);
+
+                const actionLabel = entry.action.replace(/_/g, ' ');
+
+                let detailsHtml = '';
+
+                // Status change
+                if (entry.action === 'status_change') {
+                    detailsHtml = `
+                        <div class="audit-change">
+                            <span class="old-value">${E(entry.old_value || 'N/A')}</span>
+                            →
+                            <span class="new-value">${E(entry.new_value || 'N/A')}</span>
+                        </div>
+                        ${entry.reason ? `<div class="audit-details"><strong>Reason:</strong> ${E(entry.reason)}</div>` : ''}
+                    `;
+                }
+                // Payment update
+                else if (entry.action === 'payment_update') {
+                    detailsHtml = `
+                        <div class="audit-change">
+                            Status: <span class="old-value">${E(entry.old_status || 'N/A')}</span>
+                            →
+                            <span class="new-value">${E(entry.new_status || 'N/A')}</span>
+                        </div>
+                        ${entry.amount ? `<div class="audit-details"><strong>Amount:</strong> ₹${E(entry.amount)}</div>` : ''}
+                        ${entry.payment_link ? `<div class="audit-details"><strong>Reference ID:</strong> ${E(entry.payment_link)}</div>` : ''}
+                        ${entry.recon_id_generated ? `<div class="audit-details"><strong>Recon ID generated:</strong> ${E(entry.recon_id_generated)}</div>` : ''}
+                    `;
+                }
+                // Plan change
+                else if (entry.action === 'plan_change') {
+                    detailsHtml = `
+                        <div class="audit-change">
+                            <span class="old-value">${E(entry.old_value || 'N/A')}</span>
+                            →
+                            <span class="new-value">${E(entry.new_value || 'N/A')}</span>
+                        </div>
+                        ${entry.reason ? `<div class="audit-details"><strong>Reason:</strong> ${E(entry.reason)}</div>` : ''}
+                    `;
+                }
+                // Comment added
+                else if (entry.action === 'comment_added') {
+                    detailsHtml = `<div class="audit-details">${E(entry.comment || '')}</div>`;
+                }
+
+                return `
+                    <div class="audit-item ${E(entry.action)}">
+                        <div class="audit-header">
+                            <span class="audit-action">${E(actionLabel)}</span>
+                            <span class="audit-timestamp">${timestamp}</span>
+                        </div>
+                        <div class="audit-user">By: ${E(entry.user)}</div>
+                        ${detailsHtml}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('auditTrailContent').innerHTML = html || '<div class="empty-state">No audit data available.</div>';
+        } catch (error) {
+            document.getElementById('auditTrailContent').innerHTML = '<div class="empty-state">Error loading audit trail. Please try again.</div>';
+            showToast('Error loading audit trail', 'error');
+        }
+    }
+
+    function closeAuditTrailModal() {
+        document.getElementById('auditTrailModal').style.display = 'none';
+    }
+
+    // =========================================================================
+    // REASSIGN LEAD (Admin only)
+    // =========================================================================
+
+    async function openReassignModal() {
+        const modal = document.getElementById('reassignModal');
+        const select = document.getElementById('reassignAgent');
+        select.innerHTML = '<option value="">Loading users…</option>';
+        modal.style.display = 'flex';
+        try {
+            const response = await fetch('/api/admin/users', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await response.json();
+            const active = (data.users || []).filter(u => u.is_active);
+            const currentOwner = currentLead ? (currentLead.assigned_to || '') : '';
+            select.innerHTML = active.map(u =>
+                `<option value="${E(u.email)}" ${u.email === currentOwner ? 'selected' : ''}>${E(u.name)} (${E(u.email)}) — ${E(u.role)}</option>`
+            ).join('') || '<option value="">No active users</option>';
+        } catch (e) {
+            select.innerHTML = '<option value="">Error loading users</option>';
+        }
+    }
+
+    function closeReassignModal() {
+        document.getElementById('reassignModal').style.display = 'none';
+    }
+
+    async function submitReassign() {
+        const assignee = document.getElementById('reassignAgent').value;
+        if (!assignee) { showToast('Please select a user', 'error'); return; }
+        const formData = new FormData();
+        formData.append('assignee_email', assignee);
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/assign`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${authToken}` },
+                body: formData
+            });
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.detail || 'Failed to reassign');
+            }
+            showToast('Lead reassigned successfully', 'success');
+            closeReassignModal();
+            viewLead(currentLeadId);  // refresh detail
+        } catch (e) {
+            showToast(e.message || 'Failed to reassign lead', 'error');
+        }
+    }
+
+    // =========================================================================
+    // EMAIL TRIGGER FUNCTIONS
+    // =========================================================================
+
+    async function sendNoResponseEmail() {
+        if (!confirm('Send "No Response Follow-up" email to this customer?')) return;
+
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/email/no-response`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                showToast('Follow-up email sent successfully!', 'success');
+                viewLead(currentLeadId); // Refresh to show updated comments
+            } else {
+                showToast(data.message || 'Failed to send email', 'error');
+            }
+        } catch (error) {
+            showToast('Error sending email', 'error');
+        }
+    }
+
+    async function sendPaymentConfirmation() {
+        if (!confirm('Send Payment Confirmation email to this customer?')) return;
+
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/email/payment-confirmation`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                showToast('Payment confirmation email sent!', 'success');
+                viewLead(currentLeadId);
+            } else {
+                showToast(data.message || 'Failed to send email', 'error');
+            }
+        } catch (error) {
+            showToast('Error sending email', 'error');
+        }
+    }
+
+    async function sendClosureEmail() {
+        if (!confirm('Send "No Interest Closure" email and close this lead?\n\nThis action will mark the lead as CLOSED.')) return;
+
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/email/closure`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                showToast('Lead closed and closure email sent!', 'success');
+                closeLeadModal();
+                loadLeads(currentPage); // Refresh leads table
+            } else {
+                showToast(data.message || 'Failed to send email', 'error');
+            }
+        } catch (error) {
+            showToast('Error sending email', 'error');
+        }
+    }
+
+    async function sendInterimInfo() {
+        if (!confirm('Send Interim Info email to this customer?\n\nThis will share the transaction details (Reference ID, Amount, Plan) over email.')) return;
+
+        try {
+            const response = await fetch(`/api/admin/leads/${currentLeadId}/email/interim-info`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success) {
+                showToast('Interim Info email sent successfully!', 'success');
+                viewLead(currentLeadId);  // Refresh lead detail to show new comment
+            } else {
+                // Surface backend error message (e.g. payment not paid, no email)
+                showToast(data.detail || data.message || 'Failed to send email', 'error');
+            }
+        } catch (error) {
+            showToast('Error sending email', 'error');
+        }
+    }
+
+    // Export CSV
+    async function exportCSV() {
+        const status = document.getElementById('filterStatus').value;
+        const payment = document.getElementById('filterPayment').value;
+        const city = document.getElementById('filterCity').value;
+        const assigned = document.getElementById('filterAssigned').value;
+        const fromDate = document.getElementById('filterFromDate').value;
+        const toDate = document.getElementById('filterToDate').value;
+
+        const params = new URLSearchParams();
+        if (status) params.append('status', status);
+        if (payment) params.append('payment_status', payment);
+        if (city) params.append('city', city);
+        if (assigned) params.append('assigned_to', assigned);
+        if (fromDate) params.append('from_date', fromDate);
+        if (toDate) params.append('to_date', toDate);
+
+        const url = `/api/admin/reports/leads.csv?${params}`;
+
+        try {
+            const response = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (!response.ok) throw new Error('Failed to export');
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `leads_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+
+            showToast('CSV exported successfully', 'success');
+        } catch (error) {
+            showToast('Error exporting CSV', 'error');
+        }
+    }
+
+    // Users
+    async function loadUsers() {
+        try {
+            const response = await fetch('/api/admin/users', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            const data = await response.json();
+            renderUsers(data.users);
+        } catch (error) {
+            document.getElementById('usersTable').innerHTML =
+                '<tr><td colspan="6" style="text-align: center; color: red;">Error loading users</td></tr>';
+        }
+    }
+
+    function renderUsers(users) {
+        const tbody = document.getElementById('usersTable');
+
+        if (!users || users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = users.map(user => `
+            <tr>
+                <td>${E(user.name)}</td>
+                <td>${E(user.email)}${user.phone ? `<br><span style="color:#94a3b8;font-size:12px;">${E(user.phone)}</span>` : ''}</td>
+                <td><span class="badge">${E(user.role)}</span></td>
+                <td><span class="badge ${user.is_active ? 'badge-paid' : 'badge-pending'}">${user.is_active ? 'Active' : 'Inactive'}</span></td>
+                <td>${user.last_login ? formatISTDateTime(user.last_login) : 'Never'}</td>
+                <td>
+                    ${!user.is_active ? `<button class="btn btn-sm btn-success" onclick="activateUser('${user.user_id}')">Activate</button>` : ''}
+                    ${user.is_active ? `<button class="btn btn-sm btn-danger" onclick="deactivateUser('${user.user_id}')">Deactivate</button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function showCreateUserModal() {
+        document.getElementById('createUserModal').classList.add('active');
+    }
+
+    function closeCreateUserModal() {
+        document.getElementById('createUserModal').classList.remove('active');
+        document.getElementById('createUserForm').reset();
+    }
+
+    async function createUser() {
+        const form = document.getElementById('createUserForm');
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch('/api/admin/users', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}` },
+                body: formData
+            });
+
+            if (!response.ok) throw new Error('Failed to create user');
+
+            showToast('User created successfully', 'success');
+            closeCreateUserModal();
+            loadUsers();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+
+    async function activateUser(userId) {
+        if (!confirm('Are you sure you want to activate this user?')) return;
+
+        try {
+            const response = await fetch(`/api/admin/users/${userId}/activate`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (!response.ok) throw new Error('Failed to activate user');
+
+            showToast('User activated successfully', 'success');
+            loadUsers();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    async function deactivateUser(userId) {
+        if (!confirm('Are you sure you want to deactivate this user? They will not be able to login.')) return;
+
+        try {
+            const response = await fetch(`/api/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (!response.ok) throw new Error('Failed to deactivate user');
+
+            showToast('User deactivated successfully', 'success');
+            loadUsers();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Tab switching
+    // ============================================================================
+    // COMMUNICATIONS (admin only)
+    // Log grouped by lead + Email Rules (playbook with editable CC lists)
+    // ============================================================================
+    const COMMS_TYPE_LABELS = {
+        'LEAD_ACKNOWLEDGEMENT': 'Lead Ack',
+        'NO_RESPONSE_FOLLOWUP': 'No Response',
+        'PAYMENT_CONFIRMATION': 'Payment Conf',
+        'INTERIM_INFO': 'Interim Info',
+        'NO_INTEREST_CLOSURE': 'Closure'
+    };
+    let commsCCState = {};      // email_type -> current CC array (from playbook load)
+    let commsRulesLoaded = false;
+
+    function switchCommsView(view) {
+        document.getElementById('commsPillLog').classList.toggle('active', view === 'log');
+        document.getElementById('commsPillRules').classList.toggle('active', view === 'rules');
+        document.getElementById('commsViewLog').style.display = view === 'log' ? 'block' : 'none';
+        document.getElementById('commsViewRules').style.display = view === 'rules' ? 'block' : 'none';
+        if (view === 'rules') loadCommsRules();
+        else loadCommunications();
+    }
+
+    async function loadCommunications() {
+        const tbody = document.getElementById('commsTable');
+        try {
+            const params = new URLSearchParams();
+            const t = document.getElementById('commsFilterType').value;
+            const s = document.getElementById('commsFilterStatus').value;
+            const q = document.getElementById('commsSearch').value.trim();
+            if (t) params.set('email_type', t);
+            if (s) params.set('status', s);
+            if (q) params.set('search', q);
+            params.set('limit', '100');
+
+            const res = await fetch(`/api/admin/communications?${params}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await res.json();
+
+            if (!data.leads || data.leads.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="loading">No communications yet. Every email sent from the portal will appear here.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.leads.map(l => {
+                const types = (l.types_sent || []).map(t =>
+                    `<span class="badge comms-type-badge">${E(COMMS_TYPE_LABELS[t] || t)}</span>`).join(' ');
+                const failures = l.failed_count > 0
+                    ? ` <span class="badge badge-failed">${l.failed_count} failed</span>` : '';
+                return `
+                    <tr class="comms-row" id="commsRow_${E(l.lead_id)}" onclick="toggleCommsDetail('${E(l.lead_id)}')">
+                        <td><span class="comms-expand-icon">▶</span></td>
+                        <td><strong>${E(l.lead_id)}</strong></td>
+                        <td>${E(l.lead_name || '-')}</td>
+                        <td>${E(l.to || '-')}</td>
+                        <td>${l.email_count}${failures}</td>
+                        <td>${types}</td>
+                        <td>${l.last_sent_at ? formatISTDateTime(l.last_sent_at) : '-'}</td>
+                    </tr>`;
+            }).join('');
+        } catch (err) {
+            console.error('Error loading communications:', err);
+            tbody.innerHTML = '<tr><td colspan="7" class="loading">Failed to load communications</td></tr>';
+        }
+    }
+
+    async function toggleCommsDetail(leadId) {
+        const row = document.getElementById(`commsRow_${leadId}`);
+        const existing = document.getElementById(`commsDetail_${leadId}`);
+        if (existing) {                       // second click -> collapse
+            existing.remove();
+            row.classList.remove('open');
+            return;
+        }
+        row.classList.add('open');
+        const detail = document.createElement('tr');
+        detail.className = 'comms-detail-row';
+        detail.id = `commsDetail_${leadId}`;
+        detail.innerHTML = '<td colspan="7"><div class="loading">Loading timeline...</div></td>';
+        row.after(detail);
+
+        try {
+            const res = await fetch(`/api/admin/communications/${leadId}`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await res.json();
+            const items = (data.communications || []).map(c => `
+                <div class="comms-timeline-item">
+                    <div class="comms-timeline-head">
+                        <span class="badge comms-type-badge">${E(COMMS_TYPE_LABELS[c.email_type] || c.email_type)}</span>
+                        <span class="badge badge-${c.trigger === 'auto' ? 'auto' : 'manual'}">${c.trigger === 'auto' ? 'Auto' : 'Manual'}</span>
+                        <span class="badge badge-${c.status === 'sent' ? 'sent' : 'failed'}">${E(c.status)}</span>
+                        <span style="color:#6b7280; font-size:13px;">${formatISTDateTime(c.sent_at)}</span>
+                    </div>
+                    <div class="comms-timeline-meta">
+                        <strong>Subject:</strong> ${E(c.subject || '-')}<br>
+                        <strong>From:</strong> ${E(c.from || '-')} &nbsp;→&nbsp; <strong>To:</strong> ${E(c.to || '-')}<br>
+                        <strong>CC:</strong> ${(c.cc && c.cc.length) ? c.cc.map(E).join(', ') : '<span style="color:#9ca3af;">none</span>'}<br>
+                        <strong>Sent by:</strong> ${E(c.sent_by === 'system' ? 'System (auto)' : c.sent_by)}
+                        ${c.error ? `<br><strong style="color:#991b1b;">Error:</strong> <span style="color:#991b1b;">${E(c.error)}</span>` : ''}
+                    </div>
+                </div>`).join('');
+            detail.innerHTML = `<td colspan="7"><div class="comms-timeline">${items || '<div class="loading">No emails recorded for this lead.</div>'}</div></td>`;
+        } catch (err) {
+            detail.innerHTML = '<td colspan="7"><div class="loading">Failed to load timeline</div></td>';
+        }
+    }
+
+    async function loadCommsRules() {
+        const wrap = document.getElementById('commsRulesCards');
+        try {
+            const res = await fetch('/api/admin/communications/playbook', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await res.json();
+            document.getElementById('commsFromEmail').textContent = `${data.from_name} <${data.from_email}>`;
+            commsCCState = {};
+            wrap.innerHTML = data.playbook.map(p => {
+                commsCCState[p.email_type] = p.cc || [];
+                return `
+                <div class="comms-card" id="commsCard_${p.email_type}">
+                    <div class="comms-card-head">
+                        <div>
+                            <span class="badge badge-${p.trigger === 'auto' ? 'auto' : 'manual'}">${p.trigger === 'auto' ? 'Auto' : 'Manual'}</span>
+                            <span class="comms-card-title" style="margin-left:8px;">${E(p.label)}</span>
+                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="commsPreview('${p.email_type}')">👁 Preview</button>
+                    </div>
+                    <div class="comms-card-purpose">${E(p.purpose)}</div>
+                    <dl>
+                        <dt>Trigger</dt>
+                        <dd>${E(p.trigger_detail)}</dd>
+                        <dt>Conditions</dt>
+                        <dd><ul>${p.conditions.map(c => `<li>${E(c)}</li>`).join('')}</ul></dd>
+                        <dt>Rate Limit</dt>
+                        <dd>${E(p.rate_limit)}</dd>
+                        <dt>Subject</dt>
+                        <dd>${E(p.subject)}</dd>
+                        <dt>From <span class="comms-lock">🔒 system-managed</span></dt>
+                        <dd>${E(p.from_email)}</dd>
+                        <dt>CC (editable)</dt>
+                        <dd>
+                            <div class="comms-chips" id="commsChips_${p.email_type}"></div>
+                            <div class="comms-cc-add">
+                                <input type="email" id="commsCCInput_${p.email_type}" placeholder="add.email@company.com"
+                                       onkeydown="if(event.key==='Enter'){event.preventDefault();commsAddCC('${p.email_type}');}">
+                                <button class="btn btn-sm btn-success" onclick="commsAddCC('${p.email_type}')">➕ Add</button>
+                            </div>
+                        </dd>
+                    </dl>
+                </div>`;
+            }).join('');
+            data.playbook.forEach(p => renderCCChips(p.email_type));
+            commsRulesLoaded = true;
+        } catch (err) {
+            console.error('Error loading email rules:', err);
+            wrap.innerHTML = '<div class="loading">Failed to load email rules</div>';
+        }
+    }
+
+    function renderCCChips(type) {
+        const box = document.getElementById(`commsChips_${type}`);
+        const list = commsCCState[type] || [];
+        if (!list.length) {
+            box.innerHTML = '<span class="comms-chip-empty">No CC — email goes only to the customer</span>';
+            return;
+        }
+        box.innerHTML = list.map((addr, i) => `
+            <span class="comms-chip">${E(addr)}
+                <button title="Remove from CC" onclick="commsRemoveCC('${type}', ${i})">&times;</button>
+            </span>`).join('');
+    }
+
+    async function saveCCList(type, newList) {
+        const res = await fetch(`/api/admin/communications/settings/cc/${type}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cc: newList })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to update CC list');
+        commsCCState[type] = data.cc;
+        renderCCChips(type);
+        return data.cc;
+    }
+
+    async function commsAddCC(type) {
+        const input = document.getElementById(`commsCCInput_${type}`);
+        const addr = input.value.trim();
+        if (!addr) return;
+        const exists = (commsCCState[type] || []).some(a => a.toLowerCase() === addr.toLowerCase());
+        if (exists) { showToast('That email is already on the CC list', 'error'); return; }
+        try {
+            await saveCCList(type, [...(commsCCState[type] || []), addr]);
+            input.value = '';
+            showToast(`Added to CC — applies from the next ${COMMS_TYPE_LABELS[type] || type} email`);
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    }
+
+    async function commsRemoveCC(type, index) {
+        const list = [...(commsCCState[type] || [])];
+        const removed = list.splice(index, 1)[0];
+        if (!confirm(`Remove ${removed} from the ${COMMS_TYPE_LABELS[type] || type} CC list?`)) return;
+        try {
+            await saveCCList(type, list);
+            showToast(`${removed} removed from CC`);
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    }
+
+    async function commsPreview(type) {
+        try {
+            const res = await fetch(`/api/admin/communications/playbook/${type}/preview`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || 'Preview failed');
+            document.getElementById('commsPreviewTitle').textContent = `${COMMS_TYPE_LABELS[type] || type} — Email Preview`;
+            document.getElementById('commsPreviewSubject').textContent = data.subject;
+            document.getElementById('commsPreviewNote').textContent = data.sample_note || '';
+            document.getElementById('commsPreviewFrame').srcdoc = data.html;
+            document.getElementById('commsPreviewModal').classList.add('active');
+        } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+        }
+    }
+
+    function switchTab(tab) {
+        // Update sidebar navigation
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+        // Activate clicked sidebar item
+        if (event && event.target) {
+            event.target.classList.add('active');
+            // If clicked on icon or text inside button, activate parent button
+            if (event.target.tagName !== 'BUTTON') {
+                event.target.closest('button').classList.add('active');
+            }
+        }
+
+        // Activate tab content
+        document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+
+        // Load data for specific tabs
+        if (tab === 'users') {
+            loadUsers();
+        } else if (tab === 'gyms') {
+            loadGyms();
+        } else if (tab === 'partners') {
+            loadPartners();
+        } else if (tab === 'communications') {
+            loadCommunications();
+        }
+    }
+
+    // Close modals on outside click
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    }
+
+    // Toast
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast ${type} active`;
+        setTimeout(() => toast.classList.remove('active'), 3000);
+    }
+
+    // ============================================================================
+    // GYM MANAGEMENT
+    // ============================================================================
+
+    async function loadGyms() {
+        try {
+            const response = await fetch('/api/gyms', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await response.json();
+            const gyms = data.gyms || [];  // ← FIX: Extract gyms array from response
+
+            const table = document.getElementById('gymsTable');
+            if (!gyms || gyms.length === 0) {
+                table.innerHTML = '<tr><td colspan="6" class="empty-state">No gyms found</td></tr>';
+                return;
+            }
+
+            table.innerHTML = gyms.map(gym => `
+                <tr>
+                    <td>${E(gym.gym_name)}</td>
+                    <td>${E(gym.partner_name)}</td>
+                    <td>${E(gym.city)}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${E(gym.address)}</td>
+                    <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${E(Array.isArray(gym.amenities) ? gym.amenities.join(', ') : (gym.amenities || 'N/A'))}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editGym('${gym.id || gym._id}')">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteGym('${gym.id || gym._id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading gyms:', error);
+            document.getElementById('gymsTable').innerHTML = '<tr><td colspan="6" class="empty-state">Error loading gyms</td></tr>';
+        }
+    }
+
+    function showAddGymModal() {
+        // Load partners for dropdown
+        loadPartnersForGymForm();
+        document.getElementById('addGymModal').style.display = 'flex';
+        document.getElementById('addGymForm').reset();
+    }
+
+    function closeAddGymModal() {
+        document.getElementById('addGymModal').style.display = 'none';
+    }
+
+    async function loadPartnersForGymForm() {
+        try {
+            const response = await fetch('/api/partners');
+            const data = await response.json();
+            const select = document.getElementById('gymPartner');
+            select.innerHTML = '<option value="">Select partner...</option>' +
+                data.partners.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+        } catch (error) {
+            console.error('Error loading partners:', error);
+        }
+    }
+
+    function toggleCustomPlans(mode) {
+        const sectionId = mode === 'add' ? 'customPlansSection' : 'editCustomPlansSection';
+        const toggleId = mode === 'add' ? 'customPlansToggle' : 'editCustomPlansToggle';
+        const section = document.getElementById(sectionId);
+        const toggle = document.getElementById(toggleId);
+
+        if (toggle.checked) {
+            section.style.display = 'block';
+        } else {
+            section.style.display = 'none';
+        }
+    }
+
+    async function submitAddGym() {
+        const gymData = {
+            gym_name: document.getElementById('gymName').value,
+            partner_name: document.getElementById('gymPartner').value,
+            address: document.getElementById('gymAddress').value,
+            city: document.getElementById('gymCity').value,
+            state: document.getElementById('gymState').value,
+            pincode: document.getElementById('gymPincode').value,
+            latitude: parseFloat(document.getElementById('gymLatitude').value),
+            longitude: parseFloat(document.getElementById('gymLongitude').value),
+            amenities: document.getElementById('gymAmenities').value.split(',').map(a => a.trim()).filter(a => a),
+            subscription_amount: parseInt(document.getElementById('gymSubscriptionAmount').value) || 1499
+        };
+
+        // Add custom plans if enabled
+        const customPlansToggle = document.getElementById('customPlansToggle');
+        if (customPlansToggle && customPlansToggle.checked) {
+            const plan1 = document.getElementById('plan1Month').value;
+            const plan3 = document.getElementById('plan3Months').value;
+            const plan6 = document.getElementById('plan6Months').value;
+            const plan12 = document.getElementById('plan12Months').value;
+
+            if (plan1 || plan3 || plan6 || plan12) {
+                gymData.custom_plans = {};
+                if (plan1) gymData.custom_plans['1_month'] = parseInt(plan1);
+                if (plan3) gymData.custom_plans['3_months'] = parseInt(plan3);
+                if (plan6) gymData.custom_plans['6_months'] = parseInt(plan6);
+                if (plan12) gymData.custom_plans['12_months'] = parseInt(plan12);
+            }
+        }
+
+        // Add icon if provided
+        const iconEmoji = document.getElementById('gymIconEmoji').value;
+        const iconFile = document.getElementById('gymIconFile').files[0];
+
+        if (iconEmoji) {
+            gymData.icon = iconEmoji;
+        } else if (iconFile) {
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(new Error('Failed to read file'));
+                    reader.readAsDataURL(iconFile);
+                });
+                gymData.icon = base64;
+            } catch (error) {
+                showToast('Error reading image file', 'error');
+                return;
+            }
+        }
+
+        try {
+            const response = await fetch('/api/admin/gyms', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gymData)
+            });
+
+            if (!response.ok) throw new Error('Failed to add gym');
+
+            showToast('Gym added successfully', 'success');
+            closeAddGymModal();
+            loadGyms();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    function showUploadGymsModal() {
+        document.getElementById('uploadGymsModal').style.display = 'flex';
+        document.getElementById('gymsCSVFile').value = '';
+        document.getElementById('uploadProgress').style.display = 'none';
+    }
+
+    function closeUploadGymsModal() {
+        document.getElementById('uploadGymsModal').style.display = 'none';
+    }
+
+    async function submitUploadGyms() {
+        const fileInput = document.getElementById('gymsCSVFile');
+        if (!fileInput.files || !fileInput.files[0]) {
+            showToast('Please select a CSV file', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        try {
+            document.getElementById('uploadProgress').style.display = 'block';
+            document.getElementById('uploadProgressBar').style.width = '50%';
+
+            const response = await fetch('/api/admin/gyms/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: formData
+            });
+
+            document.getElementById('uploadProgressBar').style.width = '100%';
+
+            if (!response.ok) throw new Error('Failed to upload CSV');
+
+            const result = await response.json();
+            // Backend returns gyms_created / gyms_updated / total_centers.
+            const created = result.gyms_created ?? 0;
+            const updated = result.gyms_updated ?? 0;
+            const centers = result.total_centers ?? (created + updated);
+            showToast(result.message || `Processed ${centers} centers: ${created} created, ${updated} updated`, 'success');
+            closeUploadGymsModal();
+            loadGyms();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        } finally {
+            document.getElementById('uploadProgress').style.display = 'none';
+            document.getElementById('uploadProgressBar').style.width = '0%';
+        }
+    }
+
+    async function deleteGym(gymId) {
+        if (!confirm('Are you sure you want to delete this gym?')) return;
+
+        try {
+            const response = await fetch(`/api/admin/gyms/${gymId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (!response.ok) throw new Error('Failed to delete gym');
+
+            showToast('Gym deleted successfully', 'success');
+            loadGyms();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // ============================================================================
+    // PARTNER MANAGEMENT
+    // ============================================================================
+
+    async function loadPartners() {
+        try {
+            const response = await fetch('/api/partners');
+            const data = await response.json();
+            const partners = data.partners || [];
+
+            const table = document.getElementById('partnersTable');
+            if (partners.length === 0) {
+                table.innerHTML = '<tr><td colspan="4" class="empty-state">No partners found</td></tr>';
+                return;
+            }
+
+            table.innerHTML = partners.map(partner => `
+                <tr>
+                    <td>${E(partner.name)}</td>
+                    <td>${E(partner.gym_count || 0)}</td>
+                    <td>${E(partner.cities ? partner.cities.join(', ') : 'N/A')}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editPartner('${E(partner.name).replace(/&#039;/g, '&#39;')}')">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deletePartner('${E(partner.name).replace(/&#039;/g, '&#39;')}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading partners:', error);
+            document.getElementById('partnersTable').innerHTML = '<tr><td colspan="4" class="empty-state">Error loading partners</td></tr>';
+        }
+    }
+
+    function showAddPartnerModal() {
+        document.getElementById('addPartnerModal').style.display = 'flex';
+        document.getElementById('addPartnerForm').reset();
+    }
+
+    function closeAddPartnerModal() {
+        document.getElementById('addPartnerModal').style.display = 'none';
+    }
+
+    async function submitAddPartner() {
+        const partnerData = {
+            name: document.getElementById('partnerName').value,
+            description: document.getElementById('partnerDescription').value
+        };
+
+        // Add icon if provided
+        const iconEmoji = document.getElementById('partnerIconEmoji').value;
+        const iconFile = document.getElementById('partnerIconFile').files[0];
+
+        if (iconEmoji) {
+            partnerData.icon = iconEmoji;
+        } else if (iconFile) {
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(new Error('Failed to read file'));
+                    reader.readAsDataURL(iconFile);
+                });
+                partnerData.icon = base64;
+            } catch (error) {
+                showToast('Error reading image file', 'error');
+                return;
+            }
+        }
+
+        try {
+            const response = await fetch('/api/admin/partners', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(partnerData)
+            });
+
+            if (!response.ok) throw new Error('Failed to add partner');
+
+            showToast('Partner added successfully', 'success');
+            closeAddPartnerModal();
+            loadPartners();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    async function deletePartner(partnerName) {
+        if (!confirm(`Are you sure you want to delete ${partnerName}? This will also remove all associated gyms.`)) return;
+
+        try {
+            const response = await fetch(`/api/admin/partners/${encodeURIComponent(partnerName)}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (!response.ok) throw new Error('Failed to delete partner');
+
+            showToast('Partner deleted successfully', 'success');
+            loadPartners();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Icon handling for gym and partner forms
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gym icon handling
+        const gymEmojiInput = document.getElementById('gymIconEmoji');
+        const gymFileInput = document.getElementById('gymIconFile');
+        const gymPreview = document.getElementById('gymIconPreview');
+        const gymPreviewContent = document.getElementById('gymIconPreviewContent');
+
+        if (gymEmojiInput) {
+            gymEmojiInput.addEventListener('input', function() {
+                if (this.value) {
+                    gymFileInput.value = '';
+                    gymPreviewContent.innerHTML = '<span style="font-size: 32px;">' + this.value + '</span>';
+                    gymPreview.style.display = 'block';
+                } else {
+                    gymPreview.style.display = 'none';
+                }
+            });
+        }
+
+        if (gymFileInput) {
+            gymFileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    gymEmojiInput.value = '';
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        gymPreviewContent.innerHTML = '<img src="' + e.target.result + '" style="max-width: 50px; max-height: 50px; border-radius: 4px;">';
+                        gymPreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                } else {
+                    gymPreview.style.display = 'none';
+                }
+            });
+        }
+
+        // Partner icon handling
+        const partnerEmojiInput = document.getElementById('partnerIconEmoji');
+        const partnerFileInput = document.getElementById('partnerIconFile');
+        const partnerPreview = document.getElementById('partnerIconPreview');
+        const partnerPreviewContent = document.getElementById('partnerIconPreviewContent');
+
+        if (partnerEmojiInput) {
+            partnerEmojiInput.addEventListener('input', function() {
+                if (this.value) {
+                    partnerFileInput.value = '';
+                    partnerPreviewContent.innerHTML = '<span style="font-size: 32px;">' + this.value + '</span>';
+                    partnerPreview.style.display = 'block';
+                } else {
+                    partnerPreview.style.display = 'none';
+                }
+            });
+        }
+
+        if (partnerFileInput) {
+            partnerFileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    partnerEmojiInput.value = '';
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        partnerPreviewContent.innerHTML = '<img src="' + e.target.result + '" style="max-width: 50px; max-height: 50px; border-radius: 4px;">';
+                        partnerPreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                } else {
+                    partnerPreview.style.display = 'none';
+                }
+            });
+        }
+
+        // Edit Gym icon handling
+        const editGymEmojiInput = document.getElementById('editGymIconEmoji');
+        const editGymFileInput = document.getElementById('editGymIconFile');
+        const editGymPreview = document.getElementById('editGymIconPreview');
+        const editGymPreviewContent = document.getElementById('editGymIconPreviewContent');
+
+        if (editGymEmojiInput) {
+            editGymEmojiInput.addEventListener('input', function() {
+                if (this.value) {
+                    if (editGymFileInput) editGymFileInput.value = '';
+                    editGymPreviewContent.innerHTML = '<span style="font-size: 32px;">' + this.value + '</span>';
+                    editGymPreview.style.display = 'block';
+                } else {
+                    editGymPreview.style.display = 'none';
+                }
+            });
+        }
+
+        if (editGymFileInput) {
+            editGymFileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    if (editGymEmojiInput) editGymEmojiInput.value = '';
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        editGymPreviewContent.innerHTML = '<img src="' + e.target.result + '" style="max-width: 50px; max-height: 50px; border-radius: 4px;">';
+                        editGymPreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                } else {
+                    editGymPreview.style.display = 'none';
+                }
+            });
+        }
+
+        // Edit Partner icon handling
+        const editPartnerEmojiInput = document.getElementById('editPartnerIconEmoji');
+        const editPartnerFileInput = document.getElementById('editPartnerIconFile');
+        const editPartnerPreview = document.getElementById('editPartnerIconPreview');
+        const editPartnerPreviewContent = document.getElementById('editPartnerIconPreviewContent');
+
+        if (editPartnerEmojiInput) {
+            editPartnerEmojiInput.addEventListener('input', function() {
+                if (this.value) {
+                    if (editPartnerFileInput) editPartnerFileInput.value = '';
+                    editPartnerPreviewContent.innerHTML = '<span style="font-size: 32px;">' + this.value + '</span>';
+                    editPartnerPreview.style.display = 'block';
+                } else {
+                    editPartnerPreview.style.display = 'none';
+                }
+            });
+        }
+
+        if (editPartnerFileInput) {
+            editPartnerFileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    if (editPartnerEmojiInput) editPartnerEmojiInput.value = '';
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        editPartnerPreviewContent.innerHTML = '<img src="' + e.target.result + '" style="max-width: 50px; max-height: 50px; border-radius: 4px;">';
+                        editPartnerPreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                } else {
+                    editPartnerPreview.style.display = 'none';
+                }
+            });
+        }
+    });
+
+
+    // Edit Gym Functions
+    let currentEditGymData = null;
+
+    async function editGym(gymId) {
+        try {
+            // Fetch gym data
+            const response = await fetch(`/api/gyms`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            const data = await response.json();
+
+            // Convert gymId to number if it looks like a number
+            let searchId = gymId;
+            if (!isNaN(gymId) && gymId !== '') {
+                searchId = parseInt(gymId);
+            }
+
+            // Try to find gym by ID (handle both string and number IDs)
+            const gym = data.gyms.find(g => {
+                const gId = g.id || g._id;
+                return gId == searchId || String(gId) === String(searchId);
+            });
+
+            if (!gym) {
+                showToast('Gym not found', 'error');
+                return;
+            }
+
+            currentEditGymData = gym;
+
+            // Load partners for dropdown
+            await loadPartnersForEditGymForm();
+
+            // Populate form
+            document.getElementById('editGymId').value = gymId;
+            document.getElementById('editGymName').value = gym.gym_name || '';
+            document.getElementById('editGymPartner').value = gym.partner_name || '';
+            document.getElementById('editGymAddress').value = gym.address || '';
+            document.getElementById('editGymCity').value = gym.city || '';
+            document.getElementById('editGymState').value = gym.state || '';
+            document.getElementById('editGymPincode').value = gym.pincode || '';
+            document.getElementById('editGymLatitude').value = gym.latitude || '';
+            document.getElementById('editGymLongitude').value = gym.longitude || '';
+            document.getElementById('editGymAmenities').value = Array.isArray(gym.amenities) ? gym.amenities.join(', ') : (gym.amenities || '');
+            document.getElementById('editGymSubscriptionAmount').value = gym.subscription_amount || 1499;
+
+            // Handle custom plans
+            if (gym.custom_plans && Object.keys(gym.custom_plans).length > 0) {
+                document.getElementById('editCustomPlansToggle').checked = true;
+                document.getElementById('editCustomPlansSection').style.display = 'block';
+
+                document.getElementById('editPlan1Month').value = gym.custom_plans['1_month'] || '';
+                document.getElementById('editPlan3Months').value = gym.custom_plans['3_months'] || '';
+                document.getElementById('editPlan6Months').value = gym.custom_plans['6_months'] || '';
+                document.getElementById('editPlan12Months').value = gym.custom_plans['12_months'] || '';
+            } else {
+                document.getElementById('editCustomPlansToggle').checked = false;
+                document.getElementById('editCustomPlansSection').style.display = 'none';
+            }
+
+            // Handle icon
+            if (gym.icon) {
+                if (gym.icon.startsWith('data:')) {
+                    // It's a base64 image
+                    document.getElementById('editGymIconPreviewContent').innerHTML = '<img src="' + gym.icon + '" style="max-width: 50px; max-height: 50px; border-radius: 4px;">';
+                    document.getElementById('editGymIconPreview').style.display = 'block';
+                } else {
+                    // It's an emoji
+                    document.getElementById('editGymIconEmoji').value = gym.icon;
+                    document.getElementById('editGymIconPreviewContent').innerHTML = '<span style="font-size: 32px;">' + gym.icon + '</span>';
+                    document.getElementById('editGymIconPreview').style.display = 'block';
+                }
+            }
+
+            // Show modal
+            document.getElementById('editGymModal').style.display = 'flex';
+        } catch (error) {
+            console.error('Error loading gym:', error);
+            showToast('Error loading gym data', 'error');
+        }
+    }
+
+    function closeEditGymModal() {
+        document.getElementById('editGymModal').style.display = 'none';
+        document.getElementById('editGymForm').reset();
+        document.getElementById('editGymIconPreview').style.display = 'none';
+        currentEditGymData = null;
+    }
+
+    async function loadPartnersForEditGymForm() {
+        try {
+            const response = await fetch('/api/partners');
+            const data = await response.json();
+            const select = document.getElementById('editGymPartner');
+            select.innerHTML = '<option value="">Select partner...</option>' +
+                data.partners.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+        } catch (error) {
+            console.error('Error loading partners:', error);
+        }
+    }
+
+    async function submitEditGym() {
+        const gymId = document.getElementById('editGymId').value;
+        const gymData = {
+            gym_name: document.getElementById('editGymName').value,
+            partner_name: document.getElementById('editGymPartner').value,
+            address: document.getElementById('editGymAddress').value,
+            city: document.getElementById('editGymCity').value,
+            state: document.getElementById('editGymState').value,
+            pincode: document.getElementById('editGymPincode').value,
+            latitude: parseFloat(document.getElementById('editGymLatitude').value),
+            longitude: parseFloat(document.getElementById('editGymLongitude').value),
+            amenities: document.getElementById('editGymAmenities').value.split(',').map(a => a.trim()).filter(a => a),
+            subscription_amount: parseInt(document.getElementById('editGymSubscriptionAmount').value) || 1499
+        };
+
+        // Add custom plans if enabled
+        const customPlansToggle = document.getElementById('editCustomPlansToggle');
+        if (customPlansToggle && customPlansToggle.checked) {
+            const plan1 = document.getElementById('editPlan1Month').value;
+            const plan3 = document.getElementById('editPlan3Months').value;
+            const plan6 = document.getElementById('editPlan6Months').value;
+            const plan12 = document.getElementById('editPlan12Months').value;
+
+            if (plan1 || plan3 || plan6 || plan12) {
+                gymData.custom_plans = {};
+                if (plan1) gymData.custom_plans['1_month'] = parseInt(plan1);
+                if (plan3) gymData.custom_plans['3_months'] = parseInt(plan3);
+                if (plan6) gymData.custom_plans['6_months'] = parseInt(plan6);
+                if (plan12) gymData.custom_plans['12_months'] = parseInt(plan12);
+            }
+        }
+
+        // Add icon if provided
+        const iconEmoji = document.getElementById('editGymIconEmoji').value;
+        const iconFile = document.getElementById('editGymIconFile').files[0];
+
+        if (iconEmoji) {
+            gymData.icon = iconEmoji;
+        } else if (iconFile) {
+            // Properly await file reading for ALL image formats (PNG, JPEG, GIF, etc)
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(new Error('Failed to read file'));
+                    reader.readAsDataURL(iconFile);
+                });
+                gymData.icon = base64;
+            } catch (error) {
+                showToast('Error reading image file', 'error');
+                return;
+            }
+        } else if (currentEditGymData && currentEditGymData.icon) {
+            gymData.icon = currentEditGymData.icon;
+        }
+
+        try {
+            const response = await fetch(`/api/admin/gyms/${gymId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gymData)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Failed to update gym');
+            }
+
+            showToast('Gym updated successfully', 'success');
+            closeEditGymModal();
+            loadGyms();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Edit Partner Functions
+    let currentEditPartnerData = null;
+
+    async function editPartner(partnerName) {
+        try {
+            // Fetch partner data
+            const response = await fetch('/api/partners');
+            const data = await response.json();
+            const partner = data.partners.find(p => p.name === partnerName);
+
+            if (!partner) {
+                showToast('Partner not found', 'error');
+                return;
+            }
+
+            currentEditPartnerData = partner;
+
+            // Populate form
+            document.getElementById('editPartnerOldName').value = partnerName;
+            document.getElementById('editPartnerName').value = partner.name || '';
+            document.getElementById('editPartnerDescription').value = partner.description || '';
+
+            // Handle icon
+            if (partner.icon) {
+                if (partner.icon.startsWith('data:')) {
+                    document.getElementById('editPartnerIconPreviewContent').innerHTML = '<img src="' + partner.icon + '" style="max-width: 50px; max-height: 50px; border-radius: 4px;">';
+                    document.getElementById('editPartnerIconPreview').style.display = 'block';
+                } else {
+                    document.getElementById('editPartnerIconEmoji').value = partner.icon;
+                    document.getElementById('editPartnerIconPreviewContent').innerHTML = '<span style="font-size: 32px;">' + partner.icon + '</span>';
+                    document.getElementById('editPartnerIconPreview').style.display = 'block';
+                }
+            }
+
+            // Show modal
+            document.getElementById('editPartnerModal').style.display = 'flex';
+        } catch (error) {
+            console.error('Error loading partner:', error);
+            showToast('Error loading partner data', 'error');
+        }
+    }
+
+    function closeEditPartnerModal() {
+        document.getElementById('editPartnerModal').style.display = 'none';
+        document.getElementById('editPartnerForm').reset();
+        document.getElementById('editPartnerIconPreview').style.display = 'none';
+        currentEditPartnerData = null;
+    }
+
+    async function submitEditPartner() {
+        const oldName = document.getElementById('editPartnerOldName').value;
+        const partnerData = {
+            name: document.getElementById('editPartnerName').value,
+            description: document.getElementById('editPartnerDescription').value
+        };
+
+        console.log('=== EDIT PARTNER DEBUG ===');
+        console.log('Old Name:', oldName);
+        console.log('New Name:', partnerData.name);
+
+        // Add icon if provided
+        const iconEmoji = document.getElementById('editPartnerIconEmoji').value;
+        const iconFile = document.getElementById('editPartnerIconFile').files[0];
+
+        if (iconEmoji) {
+            partnerData.icon = iconEmoji;
+        } else if (iconFile) {
+            // Properly await file reading for ALL image formats (PNG, JPEG, GIF, etc)
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(new Error('Failed to read file'));
+                    reader.readAsDataURL(iconFile);
+                });
+                partnerData.icon = base64;
+                console.log('Partner icon loaded, size:', base64.length);
+            } catch (error) {
+                showToast('Error reading image file: ' + error.message, 'error');
+                return;
+            }
+        } else if (currentEditPartnerData && currentEditPartnerData.icon) {
+            partnerData.icon = currentEditPartnerData.icon;
+        }
+
+        try {
+            console.log('Request URL:', `/api/admin/partners/${encodeURIComponent(oldName)}`);
+            console.log('Request Body:', JSON.stringify(partnerData, null, 2));
+
+            const response = await fetch(`/api/admin/partners/${encodeURIComponent(oldName)}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(partnerData)
+            });
+
+            console.log('Response Status:', response.status);
+            console.log('Response OK:', response.ok);
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Failed to update partner');
+            }
+
+            showToast('Partner updated successfully', 'success');
+            closeEditPartnerModal();
+            loadPartners();
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+            console.error('Partner update error:', error);
+        }
+    }
+
+</script>
+
+</body>
+</html>
