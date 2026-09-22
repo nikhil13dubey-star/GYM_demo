@@ -446,7 +446,20 @@ async def search_gyms_by_location(
             "coordinates": None
         }
 
-    # MODE 2: Text Location Search (Google API + geospatial)
+    # MODE 2: Text Location Search.
+    # Geocoding needs a Google API key. When none is configured (the default for
+    # this demo) fall back to matching the text against the gym catalogue itself,
+    # so city and area search keeps working without any external service.
+    if not config.GOOGLE_GEOCODING_API_KEY:
+        gyms = await gym_db.search_by_text(location_clean, partner=partner, limit=limit)
+        return {
+            "gyms": gyms,
+            "total": len(gyms),
+            "search_type": "local",
+            "location": location_clean.title(),
+            "coordinates": None
+        }
+
     try:
         geocode_result = geocode_location(location_clean)
 

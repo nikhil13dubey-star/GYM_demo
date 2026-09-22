@@ -93,7 +93,7 @@ class EmailService:
         envelope = {"from": FROM_EMAIL, "to": to_email, "cc": cc_applied, "subject": subject}
 
         if not self.client:
-            return {"success": False, "error": "SendGrid not configured", **envelope}
+            return {"success": False, "error": "Email sending is disabled in this demo (no SENDGRID_API_KEY set)", **envelope}
 
         try:
             message = Mail(

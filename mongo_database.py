@@ -172,6 +172,50 @@ class MongoGymDatabase:
         gyms = await cursor.to_list(limit)
         return [self._format_gym(g, summary=True) for g in gyms]
 
+    async def search_by_text(
+        self,
+        text: str,
+        partner: Optional[str] = None,
+        limit: int = 20
+    ) -> List[Dict]:
+        """
+        Match free text against the gym catalogue (city, locality/address, name).
+        Used when no geocoding API key is configured, so location search still
+        works offline. City matches are returned first, then address/name matches.
+        """
+        import re as _re
+        needle = _re.escape(text.strip())
+        if not needle:
+            return []
+
+        query: Dict = {"is_active": True}
+        if partner:
+            query["partner_name"] = {"$regex": f"^{_re.escape(partner)}$", "$options": "i"}
+
+        results: List[Dict] = []
+        seen = set()
+
+        # 1) exact city, 2) anything containing the text
+        for clause in (
+            {"city": {"$regex": f"^{needle}$", "$options": "i"}},
+            {"$or": [
+                {"city": {"$regex": needle, "$options": "i"}},
+                {"address": {"$regex": needle, "$options": "i"}},
+                {"gym_name": {"$regex": needle, "$options": "i"}},
+                {"state": {"$regex": f"^{needle}$", "$options": "i"}},
+            ]},
+        ):
+            cursor = self.db.gyms.find({**query, **clause}, LIST_PROJECTION).limit(limit)
+            for gym in await cursor.to_list(limit):
+                if gym["gym_id"] in seen:
+                    continue
+                seen.add(gym["gym_id"])
+                results.append(self._format_gym(gym, summary=True))
+            if len(results) >= limit:
+                break
+
+        return results[:limit]
+
     async def get_nearby_gyms(
         self,
         user_lat: float,

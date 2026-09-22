@@ -74,13 +74,18 @@ uvicorn main:app --reload
 | Admin | `admin@example.com` | `Demo@12345` |
 | Agent | `nikhil@example.com` | `Demo@12345` |
 
-### Optional API keys
+### No API keys required
 
-The app runs fine without them. Add to `.env` to enable the extras:
+The demo is fully usable with **no third-party keys at all**. A local MongoDB is the only dependency.
 
-- `GOOGLE_GEOCODING_API_KEY` — city and free-text location search. Without it those searches return an error; **PIN-code search and browsing work fully without any key**
-- `SENDGRID_API_KEY` — actually sending email (without it, sends are logged and reported as not configured)
-- A Google Maps browser key in `frontend/index.html` — map autocomplete (falls back to local suggestions)
+| Feature | Without keys | With a key |
+|---|---|---|
+| Browse gyms, PIN-code search, "near me" | works | works |
+| City / area / gym-name search | works — matched against the gym catalogue | `GOOGLE_GEOCODING_API_KEY` adds true geocoding and distance sorting |
+| Booking flow, leads, payments, invoicing, audit | works | same |
+| Sending email | **disabled** — nothing is sent, the action reports it | `SENDGRID_API_KEY` enables real delivery |
+
+Email sending is intentionally off in this demo.
 
 ---
 
